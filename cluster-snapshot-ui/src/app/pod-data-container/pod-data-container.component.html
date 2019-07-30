@@ -1,0 +1,36 @@
+<div>
+
+  <div class="alert-info pod-panel">
+    <h4 style="color: black;">Pods running</h4>
+    <p style="margin: 25%">
+      <button type="button" class="active btn btn-primary btn-lg" (click)="refreshPodDetails()"
+              title="Refresh all pods data">{{podList.length}}</button>
+    </p>
+  </div>
+
+  <br>
+
+  <div class="pad-bottom">
+    <input type="text" placeholder="search here" [(ngModel)]="searchText">
+  </div>
+  <div class="pad-bottom" *ngFor="let pod of podList | PodSearchPipe: searchText">
+    <button type="button" class="btn btn-xs btn-success" data-toggle="collapse"
+            [ngClass]="{ 'pod-not-ready': checkReady(pod)}"
+            [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
+
+    <i *ngIf="checkReady(pod)" class="fa fa-refresh fa-spin fa-fw"></i>
+
+    <button type="button" style="float: right;" (click)="refreshPodLogs(pod)">
+      <i class='fa fa-repeat' title="Refresh logs"></i></button>
+
+    <div id="{{pod.podName.split('.')[0]}}" class="collapse">
+      <p><b>{{pod.podCommand}}</b></p>
+      <p *ngIf="pod.restarts > 0"><b>Number of restarts: {{pod.restarts}}</b></p>
+      <p *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></p>
+      <pre>{{ pod.logs }}</pre>
+
+    </div>
+  </div>
+</div>
+
+

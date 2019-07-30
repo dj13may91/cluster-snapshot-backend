@@ -1,0 +1,19 @@
+<div class="pad-left">
+  <h2>Cluster common commands</h2>
+
+  <div class="pad-bottom">
+    <input type="text" placeholder="search here" [(ngModel)]="searchText">
+  </div>
+
+  <div class="pad-bottom" *ngFor="let command of clusterCommandList | clusterSearch: searchText">
+    <button type="button" class="btn btn-xs" data-toggle="collapse"
+            [attr.data-target]="'#' + command.commandName">{{command.commandValue}}</button>
+    <button style="float: right;" class="btn btn-xs" type="button" (click)="refreshLogs(command)">
+      <i class='fa fa-refresh' title="Refresh logs"></i></button>
+    <div id="{{command.commandName}}" class="collapse">
+      <pre>{{ command.log }}</pre>
+    </div>
+  </div>
+</div>
+
+
