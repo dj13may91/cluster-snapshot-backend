@@ -6,7 +6,6 @@ import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.util.Config;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +44,9 @@ public class KubernetesClient {
 
   @PostConstruct
   public void getLogEnvDeploymentOfPods() throws IOException, ApiException {
-    BufferedReader reader = instance.getBIS(ClusterCommands.GET_ALL_PODS);
-
-    List<V1Pod> v1Pods = api
-        .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
-
     try {
+      List<V1Pod> v1Pods = api
+          .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
       List<PodDetails> podDetails = new ArrayList<>(createPodObjects1(v1Pods).values());
       log.info("Running " + podDetails.size() + " pods.");
     } catch (IOException e) {
@@ -77,34 +73,10 @@ public class KubernetesClient {
     return podDetails;
   }
 
-  public Map<String, PodDetails> createPodObjects(BufferedReader reader) throws IOException {
-    String line;
-    int count = 0;
-
-    Set<String> podNameSet = new ConcurrentSkipListSet<>(podDetails.keySet());
-    while ((line = reader.readLine()) != null) {
-      if (count > 0) {
-        PodDetails pod = new PodDetails(line.split(" "));
-        podDetails.put(pod.getPodName(), pod);
-        podNameSet.remove(pod.getPodName());
-      }
-      count++;
-    }
-
-    podNameSet.forEach(podName -> {
-      podDetails.remove(podName);
-      log.warn("Pod " + podName + " is removed!");
-    });
-
-    generatePodLogs();
-    return podDetails;
-  }
-
   public void refreshPodDetails() throws ApiException, IOException {
     List<V1Pod> v1Pods = api
         .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
     createPodObjects1(v1Pods);
-//    createPodObjects(instance.getBIS(ClusterCommands.GET_ALL_PODS));
   }
 
   private void generatePodLogs() {
@@ -119,7 +91,7 @@ public class KubernetesClient {
             log.info("POD: found old logs for " + podName);
           }
         } catch (IOException e) {
-          podDetails.get(podName).setLogs("Error reading pod logs. " + e.getMessage());
+          podDetails.get(podName).setLogs("Error reading podModal logs. " + e.getMessage());
         }
       });
       log.info("Generated logs for " + podLogs.size() + " pods");
@@ -134,16 +106,18 @@ public class KubernetesClient {
 
     } catch (Exception e) {
       log.error(
-          "Error getting logs for pod:" + pod.getPodName() + ",reason: " + e.getLocalizedMessage());
+          "Error getting logs for podModal:" + pod.getPodName() + ",reason: " + e
+              .getLocalizedMessage());
       pod.setLogs("Error getting logs, error: " + e.getLocalizedMessage());
     }
-    podLogs.put(pod.getPodName(), pod.getLogs());
+    podLogs.put(pod.getPodName(),
+        StringUtils.isBlank(pod.getLogs()) ? "Unable to get logs" : pod.getLogs());
     podDetails.get(pod.getPodName()).setLogs(podLogs.get(pod.getPodName()));
     return pod.getLogs();
   }
 
 
-  public ConcurrentHashMap<String, String> getClusterDetails() throws IOException {
+  public ConcurrentHashMap<String, String> getClusterDetails() {
     ConcurrentHashMap<String, String> clusterDetailsMap = new ConcurrentHashMap<>();
     ClusterCommands.clusterCommandsMap.values().stream().parallel().forEach(command -> {
       try {
@@ -157,18 +131,4 @@ public class KubernetesClient {
     });
     return clusterDetailsMap;
   }
-
-  public String test() {
-    String log = null;
-    try {
-
-      log = api.readNamespacedPodLog("soar-rule-service-5d6ffccf9-4cpzh",
-          "soar", "", null, null, "",
-          false, 1, null, true);
-    } catch (ApiException e) {
-      e.printStackTrace();
-    }
-    return log == null ? "" : log;
-  }
-
 }

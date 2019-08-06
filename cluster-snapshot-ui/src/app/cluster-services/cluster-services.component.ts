@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {SnapshotService} from "../snapshot.service";
+import {SnapshotService} from "../shared/snapshot.service";
 import {ClusterServiceBackendClient} from "../backend-client/cluster-service-backend-client";
 import {ClusterServices} from "./ClusterServices";
 

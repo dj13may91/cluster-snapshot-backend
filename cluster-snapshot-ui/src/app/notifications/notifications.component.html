@@ -1,0 +1,19 @@
+<div *ngIf="isNew">
+  <div *ngIf="ntfcn.type == 1" style="margin: 0" class="alert alert-success alert-dismissible"
+       role="alert">{{ntfcn.message}}
+    <button type="button" class="close" (click)="onCloseNew()">
+      <span aria-hidden="true">&#10004;</span></button>
+  </div>
+
+  <div *ngIf="ntfcn.type == 2" style="margin: 0" class="alert alert-danger alert-dismissible"
+       role="alert">{{ntfcn.message}}
+    <button type="button" class="close" data-dismiss="alert" (click)="onCloseNew()">
+      <span aria-hidden="true">&#10004;</span></button>
+  </div>
+</div>
+
+<div *ngIf="!isNew" style="margin: 0" class="alert alert-dismissible" role="alert">
+  {{ntfcn.message}}
+  <button type="button" class="close" data-dismiss="alert" (click)="onCloseRead()">
+    <span aria-hidden="true">&times;</span></button>
+</div>

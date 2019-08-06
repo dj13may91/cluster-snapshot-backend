@@ -1,36 +1,41 @@
-<div>
+<div class="pad-left">
 
-  <div class="alert-info pod-panel">
-    <h4 style="color: black;">Pods running</h4>
-    <p style="margin: 25%">
-      <button type="button" class="active btn btn-primary btn-lg" (click)="refreshPodDetails()"
-              title="Refresh all pods data">{{podList.length}}</button>
-    </p>
+  <div class="card text-center" style="width: 300px">
+    <div class="card-header">Pod Data</div>
+    <div class="card-body">
+      <h5 class="card-title">Pods Running</h5>
+      <p class="card-text"></p>
+      <a class="btn btn-primary" (click)="refreshPodDetails()" [ngbTooltip]="'Refresh data'">
+        {{podList ? podList.length : 0}}</a>
+    </div>
+    <div class="card-footer text-muted" style="font-size: 10px"> Last refreshed: {{lastRefresh}}</div>
   </div>
+
 
   <br>
 
-  <div class="pad-bottom">
-    <input type="text" placeholder="search here" [(ngModel)]="searchText">
+  <div class="pad-bottom"><input type="text" placeholder="search here" [(ngModel)]="searchText">
   </div>
+
   <div class="pad-bottom" *ngFor="let pod of podList | PodSearchPipe: searchText">
-    <button type="button" class="btn btn-xs btn-success" data-toggle="collapse"
-            [ngClass]="{ 'pod-not-ready': checkReady(pod)}"
+    <button type="button" class="btn btn-xs btn-info" data-toggle="collapse"
+            [ngClass]="{'pod-not-ready': checkReady(pod)}"
             [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
+    <ngbd-modal-options [podModal]="pod"></ngbd-modal-options>
 
     <i *ngIf="checkReady(pod)" class="fa fa-refresh fa-spin fa-fw"></i>
 
-    <button type="button" style="float: right;" (click)="refreshPodLogs(pod)">
-      <i class='fa fa-repeat' title="Refresh logs"></i></button>
+    <button style="float: right;margin-right: 10%" class="btn btn-sm btn-info"
+            (click)="refreshPodLogs(pod)"
+            [ngbTooltip]="'Refresh logs'"><i class='fa fa-repeat' title="Refresh logs"></i></button>
 
     <div id="{{pod.podName.split('.')[0]}}" class="collapse">
       <p><b>{{pod.podCommand}}</b></p>
       <p *ngIf="pod.restarts > 0"><b>Number of restarts: {{pod.restarts}}</b></p>
       <p *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></p>
-      <pre>{{ pod.logs }}</pre>
+      <pre class="modal-content">{{ pod.logs }}</pre>
 
     </div>
   </div>
+
 </div>
-
-

@@ -2,28 +2,16 @@
   <h2>Cluster Services</h2>
 
   <div class="pad-bottom">
-    <input type="text" placeholder="search here" [(ngModel)]="searchText">
+    <input type="search" class="mr-sm-2" placeholder="Search" aria-label="Search"
+           [(ngModel)]="searchText">
   </div>
 
   <div class="pad-bottom" *ngFor="let svc of clusterServiceList | clusterServices: searchText">
-    <button type="button" class="btn btn-xs" data-toggle="collapse"
+    <button type="button" class="btn btn-info btn-xs" data-toggle="collapse"
             [attr.data-target]="'#' + svc.name">{{svc.serviceCommand}}</button>
-<!--    <button style="float: right;" class="btn btn-xs" type="button" (click)="refreshLogs(svc)">-->
-<!--      <i class='fa fa-refresh'></i></button>-->
     <div id="{{svc.name}}" class="collapse">
-      <pre>{{ svc.logs }}</pre>
+      <pre class="modal-content">{{ svc.logs }}</pre>
     </div>
   </div>
 
-<!--  <div class="pad-bottom" *ngFor="let service of clusterServiceList | clusterServices: searchText">-->
-<!--    <button type="button" class="btn btn-xs" data-toggle="collapse"-->
-<!--            [attr.data-target]="'#' + service.serviceCommand">{{service.serviceCommand}}</button>-->
-<!--    <button style="float: right;" class="btn btn-xs" type="button" (click)="refreshLogs(service)">-->
-<!--      <i class='fa fa-refresh'></i></button>-->
-<!--    <div id="{{service.serviceCommand}}" class="collapse">-->
-<!--      <pre>{{ service.logs }}</pre>-->
-<!--    </div>-->
-<!--  </div>-->
 </div>
-
-

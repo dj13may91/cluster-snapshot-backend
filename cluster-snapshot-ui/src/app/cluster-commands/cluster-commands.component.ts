@@ -2,7 +2,8 @@ import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {BackendClientComponent} from "../backend-client/backend-client.component";
 import {ClusterCommand} from "./cluster-command";
 import {HttpErrorResponse} from "@angular/common/http";
-import {SnapshotService} from "../snapshot.service";
+import {SnapshotService} from "../shared/snapshot.service";
+import {NotificationModel} from "../shared/NotificationModel";
 
 @Component({
   selector: 'app-cluster-commands',
@@ -48,15 +49,24 @@ export class ClusterCommandsComponent implements OnInit {
     this.clusterCommandList[index].log = 'Fetching new logs....';
     this.backend.getCommandOutput(command.commandValue).subscribe(
       (response: string) => this.clusterCommandList[index].log = response,
-      (error: HttpErrorResponse) => command.log = error.message);
+      (error: HttpErrorResponse) => {
+        command.log = error.message;
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, "Error fetching cluster logs"));
+      });
   }
 
   refreshLogs(command: ClusterCommand) {
     const index = this.clusterCommandList.indexOf(command);
     this.clusterCommandList[index].log = 'Refreshing logs....';
     this.backend.refreshClusterCommandLogs(command.commandValue).subscribe(
-      (response: string) => this.clusterCommandList[index].log = response,
-      (error: HttpErrorResponse) => command.log = error.message);
+      (response: string) => {
+        this.clusterCommandList[index].log = response;
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Fetching logs for " + command.commandName));
+      },
+      (error: HttpErrorResponse) => {
+        command.log = error.message;
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, "Error fetching logs for " + command.commandName));
+      });
   }
 
   private sortArray(arr: ClusterCommand[]) {

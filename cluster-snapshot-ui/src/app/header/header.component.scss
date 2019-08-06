@@ -1,0 +1,51 @@
+.mark-all-read {
+  float: left;
+  cursor: pointer;
+}
+
+.delete-all {
+  float: right;
+  color: darkred;
+  cursor: pointer;
+}
+
+.alert {
+  margin: 0%;
+}
+
+.overflow-list {
+  overflow-y: auto;
+  left: -100px;
+  max-height: 300px;
+  max-width: 300px;
+  min-width: 300px
+}
+
+.notification {
+  //background-color: #555;
+  //color: white;
+  text-decoration: none;
+  //padding: 15px 26px;
+  position: relative;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.notification:hover {
+  color: indianred;
+}
+
+.notification .badge {
+  z-index: 1;
+  position: absolute;
+  top: 1px;
+  right: -10px;
+  //padding: 5px 10px;
+  border-radius: 100%;
+  background: indianred;
+  color: white;
+}
+
+.notification-list {
+  font-size: 12px;
+}

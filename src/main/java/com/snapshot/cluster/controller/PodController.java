@@ -41,7 +41,7 @@ public class PodController {
   @GetMapping("/pods/refresh")
   @CrossOrigin("http://localhost:4200")
   public Collection<PodDetails> refreshPodDetails() throws IOException, ApiException {
-    log.info("Request to refresh pod data!");
+    log.info("Request to refresh podModal data!");
     client.refreshPodDetails();
     return client.podDetails.values();
   }

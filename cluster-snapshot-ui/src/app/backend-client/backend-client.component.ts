@@ -10,6 +10,8 @@ import "rxjs-compat/add/operator/catch";
 export class BackendClientComponent implements OnInit {
 
   public url = 'http://localhost:8082/';
+  public openSocket = this.url + 'sendLogs/';
+  public closeSocket = this.url +  'stopLogs/';
   public clusterCommands = this.url + 'commands/';
   public commandOutput = this.clusterCommands + 'output/';
   public refreshCommandOutput = this.clusterCommands + 'refresh/';
@@ -38,4 +40,12 @@ export class BackendClientComponent implements OnInit {
       responseType: 'text'
     });
   };
+
+  startLogs(podName: string) {
+    return this.http.get(this.openSocket + podName);
+  }
+
+  stopLogs(podName: string) {
+    return this.http.get(this.closeSocket + podName);
+  }
 }

@@ -28,9 +28,9 @@
             ],
             "styles": [
               "src/styles.scss",
-              "../cluster-snapshot/node_modules/bootstrap/dist/css/bootstrap.css"
+              "../cluster-snapshot-ui/node_modules/bootstrap/dist/css/bootstrap.css"
             ],
-            "scripts": ["../cluster-snapshot/node_modules/bootstrap/dist/js/bootstrap.min.js"],
+            "scripts": ["../cluster-snapshot-ui/node_modules/bootstrap/dist/js/bootstrap.min.js"],
             "es5BrowserSupport": true
           },
           "configurations": {

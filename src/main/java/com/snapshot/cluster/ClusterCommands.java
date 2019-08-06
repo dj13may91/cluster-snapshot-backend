@@ -32,7 +32,7 @@ public class ClusterCommands {
     clusterCommandsMap.put("getAllNodes", "kubectl get nodes");
     clusterCommandsMap.put("getClusterInfo", "kubectl cluster-info");
     clusterCommandsMap.put("getAllConfigMaps", "kubectl get configmaps --all-namespaces");
-    clusterCommandsMap.put("getMemoryOfPods", "kubectl top pod --all-namespaces");
+    clusterCommandsMap.put("getMemoryOfPods", "kubectl top podModal --all-namespaces");
     clusterCommandsMap.put("getAllServices", "kubectl get svc --all-namespaces");
     clusterCommandsMap.put("getNodeMemoryDetails", "kubectl top nodes");
     clusterCommandsMap.put("getPersistentVolumes", "kubectl get pvc --all-namespaces");

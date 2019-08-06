@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 @Data
 public class ServiceHelper {
 
+  private static final String SVC_CMD = "kubectl describe svc %s -n %s";
   private static String ingressIp;
   @Autowired
   KubernetesClient client;
@@ -36,8 +37,7 @@ public class ServiceHelper {
         List<Services> serviceObjects = createServiceObjects(reader);
         serviceObjects.stream().parallel().forEach(svc -> {
           if (StringUtils.isNotBlank(svc.getName())) {
-            svc.setServiceCommand(
-                String.format("kubectl describe svc %s -n %s", svc.getName(), svc.getNamespace()));
+            svc.setServiceCommand(String.format(SVC_CMD, svc.getName(), svc.getNamespace()));
             String svcName = svc.getName();
             try {
               svc.setLogs(client.getApi()
@@ -45,12 +45,12 @@ public class ServiceHelper {
                   .toString());
             } catch (Exception e1) {
               svc.setLogs(svc.getName() + "<b>Can not read logs for " + svc.getName() + " </b>");
+              log.error("Error generating logs for service: " + svcName);
             }
             serviceDetails.put(ClusterCommands.getCommandToDescribeService(svc), svc);
-            System.out.println("Finished Creating logs for service: " + svcName);
+            log.info("Finished Creating logs for service: " + svcName);
           }
         });
-//        log.info(String.valueOf(serviceDetails));
       } catch (Exception e) {
         log.error("error generating service logs");
       }

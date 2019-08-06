@@ -15,7 +15,15 @@ import {PodBackendClientComponent} from "./backend-client/pod-backend-client.com
 import {ClusterServicesComponent} from './cluster-services/cluster-services.component';
 import {ClusterServicesPipe} from './cluster-services/cluster-services.pipe';
 import {ClusterServiceBackendClient} from "./backend-client/cluster-service-backend-client";
-import { ServerComponentComponent } from './server-component/server-component.component';
+import {ServerComponentComponent} from './server-component/server-component.component';
+import {NotifierModuleComponent} from './notifier-module/notifier-module.component';
+import {NgbdAlertCloseable} from "./notifier-module/alert";
+import {DropdownDirective} from "./shared/dropdown.directive";
+import {NotificationsComponent} from './notifications/notifications.component';
+import {LogModalComponent} from './log-modal/log-modal.component';
+import {NgbActiveModal, NgbModalModule, NgbModule} from "@ng-bootstrap/ng-bootstrap";
+import {NgbdModalOptions} from "./log-modal/ngbd-modal-component";
+import {ScrollToBottomDirective} from "./shared/scrollToBottom.directive";
 
 @NgModule({
   declarations: [
@@ -30,16 +38,24 @@ import { ServerComponentComponent } from './server-component/server-component.co
     ClusterSearchPipe,
     ClusterServicesComponent,
     ClusterServicesPipe,
-    ServerComponentComponent
+    ServerComponentComponent,
+    NotifierModuleComponent, NgbdAlertCloseable,
+    DropdownDirective,ScrollToBottomDirective,
+    NotificationsComponent,
+    LogModalComponent,
+    NgbdModalOptions
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    NgbModule,
+    NgbModalModule
   ],
-  providers: [BackendClientComponent, PodBackendClientComponent, ClusterServiceBackendClient],
-  bootstrap: [AppComponent]
+  providers: [BackendClientComponent, PodBackendClientComponent, ClusterServiceBackendClient, NgbActiveModal],
+  bootstrap: [AppComponent],
+  entryComponents: [LogModalComponent]
 })
 export class AppModule {
 }

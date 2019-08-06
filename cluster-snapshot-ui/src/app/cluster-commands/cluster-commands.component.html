@@ -6,12 +6,14 @@
   </div>
 
   <div class="pad-bottom" *ngFor="let command of clusterCommandList | clusterSearch: searchText">
-    <button type="button" class="btn btn-xs" data-toggle="collapse"
+    <button type="button" class="btn btn-info btn-xs" data-toggle="collapse"
             [attr.data-target]="'#' + command.commandName">{{command.commandValue}}</button>
-    <button style="float: right;" class="btn btn-xs" type="button" (click)="refreshLogs(command)">
+    <button style="float: right; margin-right: 7%" class="btn btn-xs" data-toggle="open"
+            [attr.data-target]="'#' + command.commandName"
+            type="button" (click)="refreshLogs(command)">
       <i class='fa fa-refresh' title="Refresh logs"></i></button>
     <div id="{{command.commandName}}" class="collapse">
-      <pre>{{ command.log }}</pre>
+      <pre class='modal-content'>{{ command.log }}</pre>
     </div>
   </div>
 </div>
