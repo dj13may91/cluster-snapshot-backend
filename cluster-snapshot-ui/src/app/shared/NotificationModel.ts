@@ -1,6 +1,7 @@
 export class NotificationModel {
   type: number;
   message: string;
+
   public static readonly SUCCESS = 1;
   public static readonly ERROR = 2;
   public static readonly WARNING = 3;

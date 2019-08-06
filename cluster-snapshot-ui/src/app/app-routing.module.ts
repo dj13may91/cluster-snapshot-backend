@@ -9,7 +9,6 @@ const routes: Routes = [
   {path: '', redirectTo: 'all', pathMatch: 'full'},
   {
     path: 'all', component: ClusterCommandsComponent, children: [
-      // {path: 'stock', component: RecipeStartComponent},
       // {path: 'new', component: RecipeEditComponent},
       // {path: ':id', component: RecipeDetailComponent},
       // {path: ':id/edit', component: RecipeEditComponent}

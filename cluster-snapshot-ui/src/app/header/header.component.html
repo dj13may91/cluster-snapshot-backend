@@ -15,9 +15,6 @@
       </li>
       <li routerLinkActive="active" class="nav-item"><a class="nav-link" routerLink="/services">Services</a>
       </li>
-<!--      <li routerLinkActive="active" class="nav-item"><a class="nav-link"-->
-<!--                                                        routerLink="/socket">Socket</a></li>-->
-
     </ul>
   </div>
 
@@ -31,8 +28,8 @@
       class="caret"></span></a>
     <ul style="margin-right: 10%;" class="dropdown-menu overflow-list" [ngClass]="{show: r.isOpen}">
       <div class="alert-link" style="margin-bottom: 15px">
-        <a class="mark-all-read notification-list" (click)="markAllAsRead()">Mark all read</a>
-        <a class="delete-all notification-list" (click)="deleteAll()">Delete all</a>
+        <a class="mark-all-read notification-list text-info" (click)="markAllAsRead()">Read all</a>
+        <a class="delete-all notification-list text-danger" (click)="deleteAll()">Delete all</a>
       </div>
       <hr style="margin: 0 0 2px;">
       <li class="alert-success notification-list"

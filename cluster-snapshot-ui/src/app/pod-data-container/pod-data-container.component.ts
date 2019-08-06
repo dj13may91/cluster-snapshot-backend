@@ -12,9 +12,9 @@ import {NotificationModel} from "../shared/NotificationModel";
 export class PodDataContainerComponent implements OnInit {
 
   public podList: PodService[];
-
   public searchText: string;
-  public lastRefresh = new Date();
+  public timerObj;
+  public autoRefresh;
 
   constructor(public podBackendClient: PodBackendClientComponent, public snapshot: SnapshotService) {
     if (this.snapshot.podList) {
@@ -28,10 +28,11 @@ export class PodDataContainerComponent implements OnInit {
           this.snapshot.podList = podServices;
           console.log("list", this.podList);
           this.getAllPodLogs();
+          this.updateLastRefreshTime();
         },
         (error) => {
           console.log("error getting podMetadata", error);
-          var pod = new PodService();
+          let pod = new PodService();
           pod.podName = 'DummyPod123';
           pod.namespace = 'kNameSpace';
           pod.logs = new Date() + ': Something is happening';
@@ -39,9 +40,49 @@ export class PodDataContainerComponent implements OnInit {
           pod.restarts = 5;
           this.snapshot.podList = [];
           this.snapshot.podList.push(pod);
+          this.updateLastRefreshTime();
         }
       );
     }
+    this.enableAutoRefresh();
+  }
+
+  enableAutoRefresh(duration = 600000) {
+    this.autoRefresh = window.setInterval(() => {
+      this.snapshot.newNotifications.push(new NotificationModel(NotificationModel.SUCCESS, 'Auto refreshing pod details'));
+      console.log(duration, duration);
+      this.refreshPodDetails();
+    }, duration);
+  }
+
+  toggleAutoRefresh() {
+    if (this.snapshot.autoRefreshEnabled) {
+      window.clearInterval(this.autoRefresh);
+      this.autoRefresh = undefined;
+      console.log('auto refresh:', this.autoRefresh);
+      this.enableAutoRefresh((24 * 60 * 60 * 10000));
+      this.snapshot.addNewNotification(
+        (new NotificationModel(NotificationModel.WARNING, 'Auto refreshing disabled')));
+    } else {
+      this.enableAutoRefresh();
+      this.snapshot.addNewNotification(
+        new NotificationModel(NotificationModel.INFO, 'Auto refreshing enabled'));
+    }
+    this.snapshot.autoRefreshEnabled = !this.snapshot.autoRefreshEnabled;
+  }
+
+  refreshPodStatusChart() {
+    let running = 1;
+    let unstable = 1;
+    let deleted = 1;
+    if (this.snapshot.podList) {
+      this.snapshot.podList.forEach(p => {
+        if (p.deleted) deleted++;
+        else if (this.isReady(p)) running++;
+        else unstable++;
+      });
+    }
+    this.snapshot.podStatusChart = [['Running', running], ['Restarting', unstable], ['Deleted', deleted]];
   }
 
   ngOnInit() {
@@ -64,8 +105,6 @@ export class PodDataContainerComponent implements OnInit {
   }
 
   refreshPodDetails() {
-    this.lastRefresh = new Date();
-    this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Request to refresh podModal details"));
     this.podBackendClient.refreshPodDetails().subscribe(
       (podServices: PodService[]) => {
         this.podList = [];
@@ -74,14 +113,15 @@ export class PodDataContainerComponent implements OnInit {
         this.snapshot.podList.push(...podServices);
         console.log("list", this.podList);
         this.getAllPodLogs();
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Request to refresh podModal details"));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Refreshed podModal details"));
         console.log('Refreshed pods data');
       },
       (error) => {
         console.log("error refreshing podModal logs ", error);
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, "Error refreshing podModal details"));
       }
-    )
+    );
+    this.updateLastRefreshTime();
   }
 
   refreshPodLogs(pod: PodService) {
@@ -90,7 +130,8 @@ export class PodDataContainerComponent implements OnInit {
     this.podBackendClient.refreshPodLogs(pod.podName).subscribe(
       (response: string) => {
         pod.logs = response;
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Fetched new logs for podModal " + pod.podName));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
+          "logs for podModal " + pod.podName + ""));
       },
       (error) => {
         console.log("error refreshing podModal logs ", error);
@@ -112,8 +153,32 @@ export class PodDataContainerComponent implements OnInit {
     });
   }
 
-  checkReady(pod: PodService): boolean {
+  isReady(pod: PodService): boolean {
     const split = pod.ready.split("/");
-    return !(split[0] === split[1]);
+    return split[0] === split[1];
+  }
+
+  updateLastRefreshTime() {
+    this.refreshPodStatusChart();
+    this.snapshot.podLastRefresh = new Date();
+    let lrd = this.snapshot.podLastRefresh;
+    window.clearInterval(this.timerObj);
+    this.timerObj = window.setInterval(() => {
+      let age = (new Date().getTime() - lrd.getTime()) / 1000;
+      let duration = '0 sec';
+      if (age >= (60 * 60 * 24)) {
+        age = age / (60 * 60 * 24);
+        duration = age.toFixed(0) + " day";
+      } else if (age >= (60 * 60)) {
+        age = age / 3600;
+        duration = age.toFixed(0) + " hr";
+      } else if (age >= 60) {
+        age = age / 60;
+        duration = age.toFixed(0) + " min";
+      } else {
+        duration = age.toFixed(0) + ' sec';
+      }
+      document.getElementById('refreshDuration').innerHTML = 'Last refreshed: ' + duration;
+    }, 10000);
   }
 }

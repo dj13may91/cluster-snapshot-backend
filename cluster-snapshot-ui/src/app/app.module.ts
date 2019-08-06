@@ -20,10 +20,11 @@ import {NotifierModuleComponent} from './notifier-module/notifier-module.compone
 import {NgbdAlertCloseable} from "./notifier-module/alert";
 import {DropdownDirective} from "./shared/dropdown.directive";
 import {NotificationsComponent} from './notifications/notifications.component';
-import {LogModalComponent} from './log-modal/log-modal.component';
 import {NgbActiveModal, NgbModalModule, NgbModule} from "@ng-bootstrap/ng-bootstrap";
 import {NgbdModalOptions} from "./log-modal/ngbd-modal-component";
-import {ScrollToBottomDirective} from "./shared/scrollToBottom.directive";
+import {ChartComponent} from "./pod-data-container/chart.component";
+import {GoogleChartsModule} from "angular-google-charts";
+import { LogSearchPipe } from './server-component/log-search.pipe';
 
 @NgModule({
   declarations: [
@@ -40,10 +41,11 @@ import {ScrollToBottomDirective} from "./shared/scrollToBottom.directive";
     ClusterServicesPipe,
     ServerComponentComponent,
     NotifierModuleComponent, NgbdAlertCloseable,
-    DropdownDirective,ScrollToBottomDirective,
+    DropdownDirective,
     NotificationsComponent,
-    LogModalComponent,
-    NgbdModalOptions
+    NgbdModalOptions,
+    ChartComponent,
+    LogSearchPipe
   ],
   imports: [
     BrowserModule,
@@ -51,11 +53,12 @@ import {ScrollToBottomDirective} from "./shared/scrollToBottom.directive";
     HttpClientModule,
     FormsModule,
     NgbModule,
-    NgbModalModule
+    NgbModalModule,
+    GoogleChartsModule.forRoot()
   ],
   providers: [BackendClientComponent, PodBackendClientComponent, ClusterServiceBackendClient, NgbActiveModal],
   bootstrap: [AppComponent],
-  entryComponents: [LogModalComponent]
+  entryComponents: []
 })
 export class AppModule {
 }

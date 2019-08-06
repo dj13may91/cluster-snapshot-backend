@@ -1,26 +1,35 @@
-<div style="color: blue; text-align: center">
-  <h4>{{'Pod Name: ' + description}}</h4>
-</div>
+<div class="container" style="font-size: small;">
+  <div style="display: flex; align-items: center">
+    <div style="float: left; width: 5%;">
+      <button class="btn btn-default bg-info" type="button" [disabled]="!disabled"
+              (click)="connect()" [ngbTooltip]="'Start live logs'">
+        <i class="fa fa-play fa-2x" aria-hidden="true"></i></button>
+    </div>
 
-<div class="container" style="margin-top: 20px;">
-  <form class="form-inline col-form-label-sm">
-    <div class="form-group">
-      <button class="btn btn-default" type="button" [disabled]="!disabled" (click)="connect()">
-        Connect
-      </button>
-      <button class="btn btn-default" type="submit" [disabled]="disabled" (click)="disconnect()">
-        Disconnect
+    <div class="container" style="width: 80%">
+      <code class="text-info">{{pod.podCommand}}</code>
+      <pre *ngIf="pod.restarts > 0" class="text-danger">Number of restarts: {{pod.restarts}}</pre>
+      <p *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></p>
+    </div>
+
+    <div style="float: right; width: 5%">
+      <button class="btn btn-default bg-warning" type="submit" [disabled]="disabled"
+              (click)="disconnect()" [ngbTooltip]="'Pause live logs'">
+        <i class="fa fa-eject fa-2x" aria-hidden="true"></i>
       </button>
     </div>
-  </form>
+  </div>
 </div>
-<h4>Logs</h4>
+<br>
+<div *ngIf="disabled" class="pad-bottom"><input type="text" placeholder="search in logs"
+                                                [(ngModel)]="searchText"></div>
 <div class="container badge-dark" id="logModal" style="overflow: auto; max-height: 450px">
   <div class="table table-striped" style="margin-top: 20px;">
-    <tbody *ngFor="let greeting of greetings; let i = index">
-    <tr style="font-size: 12px; color: aliceblue">
-      <td [ngClass]="{'alert-info': greeting.toLocaleLowerCase().indexOf('error') >= 0 && i != 0}">
-        {{greeting}}</td>
+    <tbody *ngFor="let logLine of logs | logSearch : searchText; let i = index">
+    <tr style="font-size: 12px; color: aliceblue" *ngIf="logLine.trim().length > 1">
+      <td
+        [ngClass]="{'alert-danger': logLine.toLocaleLowerCase().indexOf('error') >= 0 && i != 0}">
+        {{logLine}}</td>
     </tr>
     </tbody>
   </div>

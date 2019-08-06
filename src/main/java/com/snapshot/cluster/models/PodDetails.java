@@ -4,6 +4,7 @@ import com.snapshot.cluster.Tags;
 import io.kubernetes.client.models.V1ContainerStatus;
 import io.kubernetes.client.models.V1Pod;
 import java.util.Date;
+import java.util.UUID;
 import lombok.Data;
 
 @Data
@@ -23,6 +24,7 @@ public class PodDetails {
   String icon = " ";
   String podCommand = "";
   boolean isDeleted = false;
+  UUID podId = UUID.randomUUID();
 
   public PodDetails(V1Pod v1Pod) {
     PodDetails podDetails = this;

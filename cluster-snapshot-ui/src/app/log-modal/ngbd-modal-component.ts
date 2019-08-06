@@ -6,21 +6,7 @@ import {PodService} from "../pod-data-container/pod.service";
   selector: 'ngbd-modal-options',
   templateUrl: './model-component.html',
   encapsulation: ViewEncapsulation.None,
-  styles: [`
-    .dark-modal .modal-content {
-      background-color: #292b2c;
-      color: white;
-      font-size: 12px;
-    }
-
-    .dark-modal .close {
-      color: white;
-    }
-
-    .light-blue-backdrop {
-      background-color: #5cb3fd;
-    }
-  `]
+  styleUrls: ['./modal-component.css']
 })
 export class NgbdModalOptions {
   closeResult: string;
@@ -62,11 +48,4 @@ export class NgbdModalOptions {
   openScrollableContent(longContent) {
     this.modalService.open(longContent, {windowClass: "setScrollBehavior()"});
   }
-
-  // getPod() {
-  //   var pod = new PodService();
-  //   pod.podName = 'DummyPod-from-modal';
-  //   pod.namespace = 'kNameSpace';
-  //   return pod;
-  // }
 }

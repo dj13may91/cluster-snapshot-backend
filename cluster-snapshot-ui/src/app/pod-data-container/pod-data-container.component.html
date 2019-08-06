@@ -1,16 +1,29 @@
 <div class="pad-left">
-
-  <div class="card text-center" style="width: 300px">
-    <div class="card-header">Pod Data</div>
-    <div class="card-body">
-      <h5 class="card-title">Pods Running</h5>
-      <p class="card-text"></p>
-      <a class="btn btn-primary" (click)="refreshPodDetails()" [ngbTooltip]="'Refresh data'">
-        {{podList ? podList.length : 0}}</a>
+  <div style="display: flex;">
+    <div class="card text-center" style="width: 300px;">
+      <div class="card-header">Pod Data</div>
+      <div class="card-body">
+        <h5 class="card-title">Pods Running</h5>
+        <p class="card-text"></p>
+        <a class="btn btn-primary" (click)="refreshPodDetails()" [ngbTooltip]="'Refresh data'">
+          {{podList ? podList.length : 0}}</a>
+      </div>
+      <div class="card-footer text-muted" style="font-size: 10px">
+        <div class="custom-control custom-switch" [ngbTooltip]="'Toggle auto-refresh'"
+             style="float: left; margin-right: 7%">
+          <input type="checkbox" class="custom-control-input" id="customSwitch1" checked
+                 (click)="toggleAutoRefresh()">
+          <label class="custom-control-label" for="customSwitch1"></label>
+        </div>
+        <span style="float: right" id="refreshDuration">
+          Last refreshed: <i class="fa fa-refresh fa-spin fa-fw"></i></span>
+      </div>
     </div>
-    <div class="card-footer text-muted" style="font-size: 10px"> Last refreshed: {{lastRefresh}}</div>
-  </div>
 
+    <div style="margin-left: 25px" class="card text-center">
+      <chart-component></chart-component>
+    </div>
+  </div>
 
   <br>
 
@@ -19,21 +32,23 @@
 
   <div class="pad-bottom" *ngFor="let pod of podList | PodSearchPipe: searchText">
     <button type="button" class="btn btn-xs btn-info" data-toggle="collapse"
-            [ngClass]="{'pod-not-ready': checkReady(pod)}"
+            [ngClass]="{'pod-not-ready': !isReady(pod)}"
             [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
     <ngbd-modal-options [podModal]="pod"></ngbd-modal-options>
 
-    <i *ngIf="checkReady(pod)" class="fa fa-refresh fa-spin fa-fw"></i>
+    <i *ngIf="!isReady(pod)" class="fa fa-refresh fa-spin fa-fw" [ngbTooltip]="'Pod not ready'"></i>
 
     <button style="float: right;margin-right: 10%" class="btn btn-sm btn-info"
-            (click)="refreshPodLogs(pod)"
-            [ngbTooltip]="'Refresh logs'"><i class='fa fa-repeat' title="Refresh logs"></i></button>
+            (click)="refreshPodLogs(pod)" [ngbTooltip]="'Refresh logs'"><i class='fa fa-repeat'></i>
+    </button>
 
     <div id="{{pod.podName.split('.')[0]}}" class="collapse">
       <p><b>{{pod.podCommand}}</b></p>
       <p *ngIf="pod.restarts > 0"><b>Number of restarts: {{pod.restarts}}</b></p>
       <p *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></p>
-      <pre class="modal-content">{{ pod.logs }}</pre>
+      <code class="modal-content" style="max-height: 500px; overflow-y: auto">
+        <pre>{{ pod.logs }}</pre>
+      </code>
 
     </div>
   </div>

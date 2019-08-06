@@ -1,19 +1,57 @@
-<div *ngIf="isNew">
-  <div *ngIf="ntfcn.type == 1" style="margin: 0" class="alert alert-success alert-dismissible"
-       role="alert">{{ntfcn.message}}
-    <button type="button" class="close" (click)="onCloseNew()">
-      <span aria-hidden="true">&#10004;</span></button>
+<code>
+  <div *ngIf="isNew">
+    <div contenteditable="true" *ngIf="ntfcn.type == 1" style="margin: 0"
+         class="alert alert-success alert-dismissible" role="alert">{{ntfcn.message}}
+      <button type="button" class="close" (click)="onCloseNew()">
+        <span aria-hidden="true">&#10004;</span></button>
+    </div>
+
+    <div *ngIf="ntfcn.type == 2" style="margin: 0" class="alert alert-danger alert-dismissible"
+         role="alert">{{ntfcn.message}}
+      <button type="button" class="close" data-dismiss="alert" (click)="onCloseNew()">
+        <i class="fa fa-fire-extinguisher" aria-hidden="true"></i></button>
+    </div>
+
+    <div *ngIf="ntfcn.type == 3" style="margin: 0" class="alert alert-warning alert-dismissible"
+         role="alert">{{ntfcn.message}}
+      <button type="button" class="close" data-dismiss="alert" (click)="onCloseNew()">
+        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i></button>
+    </div>
+
+    <div *ngIf="ntfcn.type == 4" style="margin: 0" class="alert alert-info alert-dismissible"
+         role="alert">{{ntfcn.message}}
+      <button type="button" class="close" data-dismiss="alert" (click)="onCloseNew()">
+        <span aria-hidden="true"><i class="fa fa-info-circle" aria-hidden="true"></i></span>
+      </button>
+    </div>
   </div>
 
-  <div *ngIf="ntfcn.type == 2" style="margin: 0" class="alert alert-danger alert-dismissible"
-       role="alert">{{ntfcn.message}}
-    <button type="button" class="close" data-dismiss="alert" (click)="onCloseNew()">
-      <span aria-hidden="true">&#10004;</span></button>
-  </div>
-</div>
+  <div *ngIf="!isNew">
+    <div *ngIf="ntfcn.type == 1" style="margin: 0" class="alert alert-dismissible"
+         role="alert">
+      <span class="alert-success">&#10004;</span>
+      {{ntfcn.message}}
+      <button type="button" class="close" (click)="onCloseRead()">&times;</button>
+    </div>
 
-<div *ngIf="!isNew" style="margin: 0" class="alert alert-dismissible" role="alert">
-  {{ntfcn.message}}
-  <button type="button" class="close" data-dismiss="alert" (click)="onCloseRead()">
-    <span aria-hidden="true">&times;</span></button>
-</div>
+    <div *ngIf="ntfcn.type == 2" style="margin: 0" class="alert alert-dismissible"
+         role="alert"><i class="fa fa-fire-extinguisher alert-danger"
+                         aria-hidden="true"></i>{{ntfcn.message}}
+      <button type="button" class="close" data-dismiss="alert" (click)="onCloseRead()">&times;
+      </button>
+    </div>
+
+    <div *ngIf="ntfcn.type == 3" style="margin: 0" class="alert alert-dismissible"
+         role="alert"><i class="fa fa-exclamation-triangle alert-warning"
+                         aria-hidden="true"></i>{{ntfcn.message}}
+      <button type="button" class="close" data-dismiss="alert" (click)="onCloseRead()">&times;
+      </button>
+    </div>
+
+    <div *ngIf="ntfcn.type == 4" style="margin: 0" class="alert alert-dismissible"
+         role="alert"><i class="fa fa-info-circle alert-info"></i>{{ntfcn.message}}
+      <button type="button" class="close" data-dismiss="alert" (click)="onCloseRead()">&times;
+      </button>
+    </div>
+  </div>
+</code>

@@ -14,7 +14,7 @@ export class PodService {
   public icon: string;
   public podCommand: string;
   public deleted: boolean;
-
+  public podId;
   constructor() {
   }
 }

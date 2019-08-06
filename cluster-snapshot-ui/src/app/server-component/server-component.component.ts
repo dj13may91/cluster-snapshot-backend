@@ -15,14 +15,14 @@ import {PodService} from "../pod-data-container/pod.service";
   styleUrls: ['./server-component.component.scss']
 })
 export class ServerComponentComponent implements OnInit, OnDestroy {
-
-  title = 'Web Socket';
-  greetings: string[] = [];
-  disabled = true;
-  name: string;
+  public logs: string[] = [];
+  public disabled = true;
+  public name: string;
+  public autoScroll;
+  public searchText: string;
   @Input() pod: PodService;
 
-  description = 'Angular-WebSocket Demo';
+  description;
   private stompClient = null;
 
   constructor(private backend: BackendClientComponent, private snapshot: SnapshotService) {
@@ -36,9 +36,8 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
 
   setConnected(connected: boolean) {
     this.disabled = !connected;
-
     if (connected) {
-      this.greetings = [];
+      this.logs = [];
     }
   }
 
@@ -87,6 +86,7 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
     this.setConnected(false);
     console.log('Disconnected!');
     this.closeConnection();
+    this.onLogChangeScrollToBottom(1000000);
   }
 
   //this is used to send message to backend
@@ -98,15 +98,16 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
     });
   }
 
-  onLogChangeScrollToBottom(){
-    window.setInterval(function() {
+  onLogChangeScrollToBottom(duration = 5000) {
+    window.clearInterval(this.autoScroll);
+    this.autoScroll = window.setInterval(function () {
       const elem = document.getElementById('logModal');
       elem.scrollTop = elem.scrollHeight;
-    }, 1000);
+    }, duration);
   }
 
   showLogLine(message) {
-    this.greetings.push(message);
+    this.logs.push(...message.split('\n'));
     this.onLogChangeScrollToBottom();
   }
 
@@ -128,11 +129,4 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Connection closed!!"));
       });
   }
-
-  // getPod() {
-  //   var pod = new PodService();
-  //   pod.podName = 'DummyPod123';
-  //   pod.namespace = 'kNameSpace';
-  //   return pod;
-  // }
 }

@@ -14,6 +14,12 @@ export class SnapshotService {
   public clusterServiceList: ClusterServices[];
   public readNotifications: NotificationModel[] = [];
   public newNotifications: NotificationModel[] = [];
+  public podLastRefresh = new Date();
+  public autoRefreshEnabled = true;
+  public podStatusChart = [
+    ['Demo_Running', 45.0],
+    ['Restarting', 26.8],
+    ['Deleted', 12.8]];
 
   constructor() {
   }
