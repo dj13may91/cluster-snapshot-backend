@@ -11,8 +11,8 @@
       <div class="card-footer text-muted" style="font-size: 10px">
         <div class="custom-control custom-switch" [ngbTooltip]="'Toggle auto-refresh'"
              style="float: left; margin-right: 7%">
-          <input type="checkbox" class="custom-control-input" id="customSwitch1" checked
-                 (click)="toggleAutoRefresh()">
+          <input type="checkbox" class="custom-control-input" id="customSwitch1"
+                 [checked]="snapshot.autoRefreshEnabled" (click)="toggleAutoRefresh()">
           <label class="custom-control-label" for="customSwitch1"></label>
         </div>
         <span style="float: right" id="refreshDuration">
@@ -31,13 +31,19 @@
   </div>
 
   <div class="pad-bottom" *ngFor="let pod of podList | PodSearchPipe: searchText">
-    <button type="button" class="btn btn-xs btn-info" data-toggle="collapse"
+    <button *ngIf="pod.deleted" type="button" class="btn btn-xs btn-danger" data-toggle="collapse"
+            [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
+
+    <button *ngIf="!pod.deleted" type="button" class="btn btn-xs btn-info" data-toggle="collapse"
             [ngClass]="{'pod-not-ready': !isReady(pod)}"
             [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
-    <ngbd-modal-options [podModal]="pod"></ngbd-modal-options>
-
-    <i *ngIf="!isReady(pod)" class="fa fa-refresh fa-spin fa-fw" [ngbTooltip]="'Pod not ready'"></i>
-
+    <ngbd-modal-options *ngIf="!pod.deleted" [podModal]="pod"></ngbd-modal-options>
+    <span style="margin-left: 10px">
+      <i *ngIf="pod.deleted" style="color: tomato" class="fa fa-trash"
+         [ngbTooltip]="'Pod deleted'"></i>
+      <i *ngIf="!isReady(pod)" class="fa fa-refresh fa-spin fa-fw"
+         [ngbTooltip]="'Pod not ready'"></i>
+    </span>
     <button style="float: right;margin-right: 10%" class="btn btn-sm btn-info"
             (click)="refreshPodLogs(pod)" [ngbTooltip]="'Refresh logs'"><i class='fa fa-repeat'></i>
     </button>
@@ -46,7 +52,7 @@
       <p><b>{{pod.podCommand}}</b></p>
       <p *ngIf="pod.restarts > 0"><b>Number of restarts: {{pod.restarts}}</b></p>
       <p *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></p>
-      <code class="modal-content" style="max-height: 500px; overflow-y: auto">
+      <code class="modal-content" style="max-height: 500px;max-width: 95%; overflow-y: auto">
         <pre>{{ pod.logs }}</pre>
       </code>
 

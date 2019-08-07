@@ -61,20 +61,23 @@ export class PodDataContainerComponent implements OnInit {
       this.autoRefresh = undefined;
       console.log('auto refresh:', this.autoRefresh);
       this.enableAutoRefresh((24 * 60 * 60 * 10000));
+      console.log('this.autoRefresh set to 1day');
       this.snapshot.addNewNotification(
         (new NotificationModel(NotificationModel.WARNING, 'Auto refreshing disabled')));
     } else {
       this.enableAutoRefresh();
       this.snapshot.addNewNotification(
         new NotificationModel(NotificationModel.INFO, 'Auto refreshing enabled'));
+      console.log('autoRefresh set to .1 mins');
+
     }
     this.snapshot.autoRefreshEnabled = !this.snapshot.autoRefreshEnabled;
   }
 
   refreshPodStatusChart() {
-    let running = 1;
-    let unstable = 1;
-    let deleted = 1;
+    let running = 0;
+    let unstable = 0;
+    let deleted = 0;
     if (this.snapshot.podList) {
       this.snapshot.podList.forEach(p => {
         if (p.deleted) deleted++;
