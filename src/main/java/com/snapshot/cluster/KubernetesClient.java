@@ -4,6 +4,7 @@ import com.snapshot.cluster.models.PodDetails;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.CoreV1Api;
+import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.util.Config;
 import java.io.IOException;
@@ -25,9 +26,18 @@ import org.yaml.snakeyaml.DumperOptions;
 @Data
 public class KubernetesClient {
 
+  static ApiClient defaultClient;
+
+  static {
+    try {
+      defaultClient = Config.defaultClient();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   public Map<String, PodDetails> podDetails = new ConcurrentHashMap<>();
   public ConcurrentHashMap<String, String> podLogs = new ConcurrentHashMap<>();
-
   //  @Autowired
   TerminalInstance instance = new TerminalInstance();
   boolean runLog = true;
@@ -35,18 +45,52 @@ public class KubernetesClient {
   private CoreV1Api api;
 
   KubernetesClient() throws IOException {
-    ApiClient defaultClient = Config.defaultClient();
     api = new CoreV1Api(defaultClient);
     options = new DumperOptions();
     options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
     options.setPrettyFlow(true);
   }
 
+  public static void deletePod(String podName) throws ApiException, IOException {
+    ExtensionsV1beta1Api api = new ExtensionsV1beta1Api(defaultClient);
+//    System.out.println(api.listNamespacedDeployment("soar", null, null,
+//        null, null, null, null,
+//        null, null, null)
+//        .getItems().get(2));
+    KubernetesClient kc = new KubernetesClient();
+    try {
+      kc.getApi()
+          .deleteNamespacedPod("soar-rule-service-785d4b45d7-vjwtm", "soar", null, null, null, null,
+              null, null);
+    } catch (ApiException aX) {
+      System.out.println(aX);
+      System.out.println("Pod not found");
+    } catch (Exception e) {
+      try {
+        System.out.println(e);
+        Thread.sleep(5000);
+        System.out.println(
+            kc.api.readNamespacedPodStatus("soar-rule-service-785d4b45d7-vjwtm", "soar", null));
+        Thread.sleep(3000);
+        kc.api.readNamespacedPod("soar-rule-service-785d4b45d7-vjwtm", "soar", null, null, null);
+      } catch (ApiException apiEx) {
+        if (apiEx.getMessage().equals("Not Found")) {
+          System.out.println("Pod deleted");
+        } else {
+          System.out.println("apiEx: " + apiEx);
+        }
+      } catch (InterruptedException ex) {
+        ex.printStackTrace();
+      }
+    }
+  }
+
   @PostConstruct
   public void getLogEnvDeploymentOfPods() throws IOException, ApiException {
     try {
       List<V1Pod> v1Pods = api
-          .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
+          .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null)
+          .getItems();
       List<PodDetails> podDetails = new ArrayList<>(createPodObjects1(v1Pods).values());
       log.info("Running " + podDetails.size() + " pods.");
     } catch (IOException e) {
@@ -65,8 +109,8 @@ public class KubernetesClient {
     });
 
     podNameSet.forEach(podName -> {
-      podDetails.remove(podName);
-      log.warn("Pod " + podName + " is removed!");
+      podDetails.get(podName).setDeleted(true);
+      log.warn("Pod " + podName + " is deleted!");
     });
 
     generatePodLogs();
@@ -115,7 +159,6 @@ public class KubernetesClient {
     podDetails.get(pod.getPodName()).setLogs(podLogs.get(pod.getPodName()));
     return pod.getLogs();
   }
-
 
   public ConcurrentHashMap<String, String> getClusterDetails() {
     ConcurrentHashMap<String, String> clusterDetailsMap = new ConcurrentHashMap<>();

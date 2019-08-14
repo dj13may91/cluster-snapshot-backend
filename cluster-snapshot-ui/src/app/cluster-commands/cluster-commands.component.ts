@@ -1,3 +1,4 @@
+import 'rxjs/Rx';
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {BackendClientComponent} from "../backend-client/backend-client.component";
 import {ClusterCommand} from "./cluster-command";

@@ -23,7 +23,7 @@
 <br>
 <div *ngIf="disabled" class="pad-bottom"><input type="text" placeholder="search in logs"
                                                 [(ngModel)]="searchText"></div>
-<div class="container badge-dark" id="logModal" style="overflow-y: auto; max-height: 450px">
+<div class="container badge-dark" id='{{sessionId}}' style="overflow-y: auto; max-height: 450px">
   <div class="table table-striped" style="margin-top: 20px;">
     <tbody *ngFor="let logLine of logs | logSearch : searchText; let i = index">
     <tr style="font-size: 12px; color: aliceblue" *ngIf="logLine.trim().length > 1">

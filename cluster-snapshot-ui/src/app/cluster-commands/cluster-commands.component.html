@@ -5,13 +5,14 @@
     <input type="text" placeholder="search here" [(ngModel)]="searchText">
   </div>
 
-  <div class="pad-bottom" *ngFor="let command of clusterCommandList | clusterSearch: searchText">
+  <div class="pad-bottom" *ngFor="let command of clusterCommandList | clusterSearch: searchText; let i = index">
     <button type="button" class="btn btn-info btn-xs" data-toggle="collapse"
             [attr.data-target]="'#' + command.commandName">{{command.commandValue}}</button>
-    <button style="float: right; margin-right: 7%" class="btn btn-xs" data-toggle="open"
-            [attr.data-target]="'#' + command.commandName"
-            type="button" (click)="refreshLogs(command)">
-      <i class='fa fa-refresh' title="Refresh logs"></i></button>
+    <span style="float: right; margin-right: 7%">
+      <app-download-component [component]="command" [type]="'clustercommand'"></app-download-component>
+      <button class="btn btn-xs" data-toggle="open" type="button" (click)="refreshLogs(command)" [attr.data-target]="'#' + command.commandName">
+      <i class='fa fa-refresh' [ngbTooltip]="'Refresh logs'"></i></button>
+    </span>
     <div id="{{command.commandName}}" class="collapse">
       <pre class='modal-content'>{{ command.log }}</pre>
     </div>

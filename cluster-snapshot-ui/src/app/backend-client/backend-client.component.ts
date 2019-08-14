@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import "rxjs-compat/add/operator/map";
 import "rxjs-compat/add/operator/catch";
+import {RandomIdGenerator} from "../shared/random-id-generator";
 
 @Component({
   selector: 'app-backend-client',
@@ -41,11 +42,19 @@ export class BackendClientComponent implements OnInit {
     });
   };
 
-  startLogs(podName: string) {
-    return this.http.get(this.openSocket + podName);
+  startLogs(podName: string, sessionId: string) {
+    let httpParams = new HttpParams().append('sessionId', sessionId);
+    return this.http.post(this.openSocket + podName, httpParams, {
+      responseType: 'text'
+    });
+    // return this.http.get(this.openSocket + podName);
   }
 
-  stopLogs(podName: string) {
-    return this.http.get(this.closeSocket + podName);
+  stopLogs(podName: string, sessionId: string) {
+    let httpParams = new HttpParams().append('sessionId', sessionId);
+    return this.http.post(this.closeSocket + podName, httpParams, {
+      responseType: 'text'
+    });
+    // return this.http.get(this.closeSocket + podName);
   }
 }

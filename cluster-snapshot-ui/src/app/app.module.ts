@@ -25,6 +25,7 @@ import {NgbdModalOptions} from "./log-modal/ngbd-modal-component";
 import {ChartComponent} from "./pod-data-container/chart.component";
 import {GoogleChartsModule} from "angular-google-charts";
 import { LogSearchPipe } from './server-component/log-search.pipe';
+import { DownloadComponentComponent } from './download-component/download-component.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { LogSearchPipe } from './server-component/log-search.pipe';
     NotificationsComponent,
     NgbdModalOptions,
     ChartComponent,
-    LogSearchPipe
+    LogSearchPipe,
+    DownloadComponentComponent,
   ],
   imports: [
     BrowserModule,

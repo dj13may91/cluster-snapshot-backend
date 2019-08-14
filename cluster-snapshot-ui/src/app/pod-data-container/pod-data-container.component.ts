@@ -61,7 +61,7 @@ export class PodDataContainerComponent implements OnInit {
       this.autoRefresh = undefined;
       console.log('auto refresh:', this.autoRefresh);
       this.enableAutoRefresh((24 * 60 * 60 * 10000));
-      console.log('this.autoRefresh set to 1day');
+      console.log('autoRefresh set to 1day');
       this.snapshot.addNewNotification(
         (new NotificationModel(NotificationModel.WARNING, 'Auto refreshing disabled')));
     } else {
@@ -118,13 +118,13 @@ export class PodDataContainerComponent implements OnInit {
         this.getAllPodLogs();
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Refreshed podModal details"));
         console.log('Refreshed pods data');
+        this.updateLastRefreshTime();
       },
       (error) => {
         console.log("error refreshing podModal logs ", error);
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, "Error refreshing podModal details"));
       }
     );
-    this.updateLastRefreshTime();
   }
 
   refreshPodLogs(pod: PodService) {

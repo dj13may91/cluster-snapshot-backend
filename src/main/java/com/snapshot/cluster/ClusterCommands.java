@@ -20,19 +20,20 @@ public class ClusterCommands {
   public static final String GET_ALL_SERVICES = "kubectl get svc --all-namespaces";
   public static final String GET_NODE_MEMORY_DETAILS = "kubectl top nodes";
   public static final String GET_PERSISTENT_VOLUMES = "kubectl get pvc --all-namespaces";
+  public static final String GET_DEPLOYMENTS = "kubectl get deployments --all-namespaces";
 
   public static Map<String, String> clusterCommandsMap = new TreeMap<>();
 
   static {
-    clusterCommandsMap.put("clusterName", "kubectl config current-context");
+    clusterCommandsMap.put("clusterName", CLUSTER_NAME);
 //    clusterCommandsMap.put("helmChartsAllNamespaces", "helm ls --all");
-    clusterCommandsMap.put("getAllPods", "kubectl get pods --all-namespaces -o wide");
+    clusterCommandsMap.put("getAllPods", GET_ALL_PODS);
     clusterCommandsMap.put("getAllPodsPlatform", "kubectl get pods -n seca");
     clusterCommandsMap.put("getAllPVC", "kubectl get persistentvolumes");
     clusterCommandsMap.put("getAllNodes", "kubectl get nodes");
     clusterCommandsMap.put("getClusterInfo", "kubectl cluster-info");
     clusterCommandsMap.put("getAllConfigMaps", "kubectl get configmaps --all-namespaces");
-    clusterCommandsMap.put("getMemoryOfPods", "kubectl top podModal --all-namespaces");
+    clusterCommandsMap.put("getMemoryOfPods", "kubectl top pods --all-namespaces");
     clusterCommandsMap.put("getAllServices", "kubectl get svc --all-namespaces");
     clusterCommandsMap.put("getNodeMemoryDetails", "kubectl top nodes");
     clusterCommandsMap.put("getPersistentVolumes", "kubectl get pvc --all-namespaces");
@@ -41,6 +42,7 @@ public class ClusterCommands {
     clusterCommandsMap.put("getEverything", "kubectl get all --all-namespaces");
     clusterCommandsMap.put("getAllReplicaSets", "kubectl get replicasets --all-namespaces");
     clusterCommandsMap.put("getCurrentEvents", "kubectl get events --all-namespaces");
+    clusterCommandsMap.put("getAllDeployments", GET_DEPLOYMENTS);
   }
 
   public static String getCommandToDescribeConfigMap(ConfigMaps configMap) {

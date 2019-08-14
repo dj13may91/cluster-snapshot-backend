@@ -27,7 +27,8 @@
 
   <br>
 
-  <div class="pad-bottom"><input type="text" placeholder="search here" [(ngModel)]="searchText">
+  <div class="pad-bottom">
+    <input type="search" class="mr-sm-2" placeholder="Search" [(ngModel)]="searchText">
   </div>
 
   <div class="pad-bottom" *ngFor="let pod of podList | PodSearchPipe: searchText">
@@ -35,24 +36,29 @@
             [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
 
     <button *ngIf="!pod.deleted" type="button" class="btn btn-xs btn-info" data-toggle="collapse"
-            [ngClass]="{'pod-not-ready': !isReady(pod)}"
+            [ngClass]="{'pod-not-ready': !isReady(pod)}" [ngbTooltip]="pod.age + ' old'"
             [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
     <ngbd-modal-options *ngIf="!pod.deleted" [podModal]="pod"></ngbd-modal-options>
     <span style="margin-left: 10px">
-      <i *ngIf="pod.deleted" style="color: tomato" class="fa fa-trash"
-         [ngbTooltip]="'Pod deleted'"></i>
+      <i *ngIf="pod.deleted" style="color: tomato" class="fa fa-trash fa-spin fa-fw"
+         [ngbTooltip]="'Pod deleted in ' + pod.age"></i>
       <i *ngIf="!isReady(pod)" class="fa fa-refresh fa-spin fa-fw"
          [ngbTooltip]="'Pod not ready'"></i>
     </span>
-    <button style="float: right;margin-right: 10%" class="btn btn-sm btn-info"
-            (click)="refreshPodLogs(pod)" [ngbTooltip]="'Refresh logs'"><i class='fa fa-repeat'></i>
-    </button>
 
+    <span style="float: right; margin-right: 7%">
+      <button *ngIf="!pod.deleted" class="btn btn-sm btn-primary" (click)="refreshPodLogs(pod)"
+              [ngbTooltip]="'Refresh logs'" style="margin-right: 5px">
+        <i class='fa fa-refresh fa-spin' title="Refresh logs"></i>
+      </button>
+      <app-download-component [component]="pod" [type]="'podservice'"></app-download-component>
+
+    </span>
     <div id="{{pod.podName.split('.')[0]}}" class="collapse">
-      <p><b>{{pod.podCommand}}</b></p>
-      <p *ngIf="pod.restarts > 0"><b>Number of restarts: {{pod.restarts}}</b></p>
-      <p *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></p>
-      <code class="modal-content" style="max-height: 500px;max-width: 95%; overflow-y: auto">
+      <span><b>{{pod.podCommand}}</b></span>
+      <span *ngIf="pod.restarts > 0"><br><b>Number of restarts: {{pod.restarts}}</b></span>
+      <span *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></span>
+      <code class="modal-content" style="max-height: 500px;max-width: 90%; overflow-y: auto">
         <pre>{{ pod.logs }}</pre>
       </code>
 

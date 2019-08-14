@@ -9,6 +9,11 @@
   <div class="pad-bottom" *ngFor="let svc of clusterServiceList | clusterServices: searchText">
     <button type="button" class="btn btn-info btn-xs" data-toggle="collapse"
             [attr.data-target]="'#' + svc.name">{{svc.serviceCommand}}</button>
+
+    <span style="float: right; margin-right: 7%">
+      <app-download-component [component]="svc" [type]="'clusterservices'"></app-download-component>
+    </span>
+
     <div id="{{svc.name}}" class="collapse">
       <pre class="modal-content">{{ svc.logs }}</pre>
     </div>

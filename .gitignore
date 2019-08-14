@@ -27,3 +27,9 @@ HELP.md
 
 ### VS Code ###
 .vscode/
+
+Dockerfile
+.dockerignore
+docker-compose*
+run.sh
+src/main/java/com/snapshot/cluster/Test.java

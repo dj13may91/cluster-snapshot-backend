@@ -21,7 +21,7 @@ export class NotifierModuleComponent implements OnInit {
     this._success.pipe(debounceTime(5000)).subscribe(() => this.successMessage = null);
   }
 
-  changeSuccessMessage(message: string) {
+  changeSuccessMessage(message = new Date().toDateString()) {
     this._success.next(message + ' - Message successfully changed.');
   }
 
