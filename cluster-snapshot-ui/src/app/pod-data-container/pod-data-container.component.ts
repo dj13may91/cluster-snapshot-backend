@@ -15,6 +15,10 @@ export class PodDataContainerComponent implements OnInit {
   public searchText: string;
   public timerObj;
   public autoRefresh;
+  public namespaceList;
+  public podStatusList = ['Running', 'Restarting', 'Deleted'];
+  public namespaceFilter: string = 'all';
+  private podStatusFilter: string = 'all';
 
   constructor(public podBackendClient: PodBackendClientComponent, public snapshot: SnapshotService) {
     if (this.snapshot.podList) {
@@ -45,6 +49,10 @@ export class PodDataContainerComponent implements OnInit {
       );
     }
     this.enableAutoRefresh();
+  }
+
+  ngOnInit() {
+    this.getNamespaceList();
   }
 
   enableAutoRefresh(duration = 600000) {
@@ -81,14 +89,25 @@ export class PodDataContainerComponent implements OnInit {
     if (this.snapshot.podList) {
       this.snapshot.podList.forEach(p => {
         if (p.deleted) deleted++;
-        else if (this.isReady(p)) running++;
+        else if (PodDataContainerComponent.isReady(p)) running++;
         else unstable++;
       });
     }
-    this.snapshot.podStatusChart = [['Running', running], ['Restarting', unstable], ['Deleted', deleted]];
+    this.snapshot.podStatusChart = [
+      [this.podStatusList[0], running],
+      [this.podStatusList[1], unstable],
+      [this.podStatusList[2], deleted]];
   }
 
-  ngOnInit() {
+  getNamespaceList() {
+    this.podBackendClient.getNamespaceList().subscribe(
+      (response) => {
+        console.log('namespaces', response)
+        this.namespaceList = response;
+        console.log(this.namespaceList)
+      },
+      (error) => console.log(error)
+    )
   }
 
   getAllPodLogs() {
@@ -143,10 +162,6 @@ export class PodDataContainerComponent implements OnInit {
     )
   }
 
-  delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
   private sortArray(arr: PodService[]) {
     return arr.sort((a: PodService, b: PodService) => {
       if (a.podName > b.podName)
@@ -156,7 +171,10 @@ export class PodDataContainerComponent implements OnInit {
     });
   }
 
-  isReady(pod: PodService): boolean {
+  isReady(pod: PodService): boolean{
+    return PodDataContainerComponent.isReady(pod);
+  }
+  static isReady(pod: PodService): boolean {
     const split = pod.ready.split("/");
     return split[0] === split[1];
   }
@@ -181,7 +199,22 @@ export class PodDataContainerComponent implements OnInit {
       } else {
         duration = age.toFixed(0) + ' sec';
       }
-      document.getElementById('refreshDuration').innerHTML = 'Last refreshed: ' + duration;
+      document.getElementById('refreshDuration').innerHTML = 'Last refreshed: ' + duration + ' ago';
     }, 10000);
+  }
+
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  setNamespaceFilter(event){
+    this.namespaceFilter = event.target.value;
+    console.log(this.namespaceFilter);
+  }
+
+
+   setPodStatusFilter(event) {
+    this.podStatusFilter = event.target.value;
+    console.log(this.podStatusFilter);
   }
 }

@@ -4,19 +4,21 @@ import {ClusterCommandsComponent} from "./cluster-commands/cluster-commands.comp
 import {PodDataContainerComponent} from "./pod-data-container/pod-data-container.component";
 import {ClusterServicesComponent} from "./cluster-services/cluster-services.component";
 import {ServerComponentComponent} from "./server-component/server-component.component";
+import {DashboardComponentComponent} from "./dashboard-component/dashboard-component.component";
 
 const routes: Routes = [
-  {path: '', redirectTo: 'all', pathMatch: 'full'},
+  {path: '', redirectTo: 'home', pathMatch: 'full'},
   {
-    path: 'all', component: ClusterCommandsComponent, children: [
+    path: 'home', component: ClusterCommandsComponent, children: [
       // {path: 'new', component: RecipeEditComponent},
       // {path: ':id', component: RecipeDetailComponent},
       // {path: ':id/edit', component: RecipeEditComponent}
     ]
   },
-  {path: 'pods', component: PodDataContainerComponent},
+  {path: 'pods', component: PodDataContainerComponent, children: []},
   {path: 'services', component: ClusterServicesComponent},
-  {path: 'socket', component: ServerComponentComponent}
+  {path: 'socket', component: ServerComponentComponent},
+  {path: 'dashboards', component: DashboardComponentComponent}
 ];
 
 @NgModule({

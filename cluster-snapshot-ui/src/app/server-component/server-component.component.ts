@@ -21,14 +21,13 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
   public name: string;
   public autoScroll;
   public searchText: string;
-  public sessionId: string;
+  public sessionId = RandomIdGenerator.makeid(6) + '-' + RandomIdGenerator.makeid(4) + '-' + RandomIdGenerator.makeid(6);
   @Input() pod: PodService;
 
   description;
   private stompClient = null;
 
   constructor(private backend: BackendClientComponent, private snapshot: SnapshotService) {
-    this.sessionId = RandomIdGenerator.makeid(6) + '-' + RandomIdGenerator.makeid(4) + '-' + RandomIdGenerator.makeid(6);
   }
 
   ngOnInit(): void {
@@ -93,7 +92,7 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
   onLogChangeScrollToBottom(duration = 3000) {
     window.clearInterval(this.autoScroll);
     this.autoScroll = window.setInterval(function () {
-      const elem = document.getElementById(this.sessionId);
+      const elem = document.getElementById('logModal');
       elem.scrollTop = elem.scrollHeight;
     }, duration);
   }
@@ -131,7 +130,7 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.disconnect();
-    this.autoScroll = null;
+    // this.autoScroll = null;
     console.log('web socket destroyed for session: ' + this.sessionId);
   }
 }

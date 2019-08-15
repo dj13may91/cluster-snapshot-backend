@@ -1,7 +1,6 @@
 <div class="pad-left">
   <div style="display: flex;">
     <div class="card text-center" style="width: 300px;">
-      <div class="card-header">Pod Data</div>
       <div class="card-body">
         <h5 class="card-title">Pods Running</h5>
         <p class="card-text"></p>
@@ -23,15 +22,31 @@
     <div style="margin-left: 25px" class="card text-center">
       <chart-component></chart-component>
     </div>
+
   </div>
 
   <br>
 
-  <div class="pad-bottom">
+  <div class="pad-bottom" style="display: flex">
     <input type="search" class="mr-sm-2" placeholder="Search" [(ngModel)]="searchText">
+    <div class="dropdown" style="margin-left: 25px">
+      <select class="form-control-sm" (change)="setNamespaceFilter($event)">
+        <option selected value="all">All Namespaces</option>
+        <option *ngFor="let namespace of namespaceList" value="{{namespace}}">{{namespace}}</option>
+      </select>
+    </div>
+
+    <div class="dropdown" style="margin-left: 25px">
+      <select class="form-control-sm" (change)="setPodStatusFilter($event)">
+        <option selected value="all">All status</option>
+        <option *ngFor="let status of podStatusList" value="{{status}}">{{status}}</option>
+      </select>
+    </div>
   </div>
 
-  <div class="pad-bottom" *ngFor="let pod of podList | PodSearchPipe: searchText">
+
+  <div class="pad-bottom"
+       *ngFor="let pod of podList | PodSearchPipe: searchText: namespaceFilter: podStatusFilter">
     <button *ngIf="pod.deleted" type="button" class="btn btn-xs btn-danger" data-toggle="collapse"
             [attr.data-target]="'#' + pod.podName.split('.')[0]">{{pod.podName}}</button>
 
@@ -49,7 +64,7 @@
     <span style="float: right; margin-right: 7%">
       <button *ngIf="!pod.deleted" class="btn btn-sm btn-primary" (click)="refreshPodLogs(pod)"
               [ngbTooltip]="'Refresh logs'" style="margin-right: 5px">
-        <i class='fa fa-refresh fa-spin' title="Refresh logs"></i>
+        <i class='fa fa-refresh' title="Refresh logs"></i>
       </button>
       <app-download-component [component]="pod" [type]="'podservice'"></app-download-component>
 
@@ -61,7 +76,6 @@
       <code class="modal-content" style="max-height: 500px;max-width: 90%; overflow-y: auto">
         <pre>{{ pod.logs }}</pre>
       </code>
-
     </div>
   </div>
 

@@ -81,6 +81,7 @@ public class LiveLogsController {
         if (StringUtils.isNotBlank(logLine)) {
           this.template.convertAndSend(topic, logLine);
           System.out.println(loggingTracker.get(sessionId).getCount());
+          loggingTracker.get(sessionId).count++;
         }
         try {
           Thread.sleep(950);

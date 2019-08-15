@@ -17,4 +17,9 @@ export class PodService {
   public podId;
   constructor() {
   }
+
+  static isReady(pod: PodService): boolean {
+    const split = pod.ready.split("/");
+    return split[0] === split[1];
+  }
 }

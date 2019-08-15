@@ -2,39 +2,11 @@
   padding-bottom: 10px
 }
 
-.pad-left{
+.pad-left {
   margin-top: 10px;
-  padding-left: 2%;
+  //padding-left: 2%;
 }
 
 .pod-not-ready {
   background-color: darkkhaki;
-}
-
-.pod-panel {
-  width: 125px;
-  height: 125px;
-  margin: 10px 10px 1px;
-}
-
-
-.alert-minimalist {
-  background-color: rgb(241, 242, 240);
-  border-color: rgba(149, 149, 149, 0.3);
-  border-radius: 3px;
-  color: rgb(149, 149, 149);
-  padding: 10px;
-}
-.alert-minimalist > [data-notify="icon"] {
-  height: 50px;
-  margin-right: 12px;
-}
-.alert-minimalist > [data-notify="title"] {
-  color: rgb(51, 51, 51);
-  display: block;
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-.alert-minimalist > [data-notify="message"] {
-  font-size: 80%;
 }

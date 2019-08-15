@@ -6,6 +6,8 @@ import com.snapshot.cluster.models.PodDetails;
 import io.kubernetes.client.ApiException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -53,4 +55,11 @@ public class PodController {
     return client.getPodLog(client.podDetails.get(podName));
   }
 
+
+  @GetMapping("/pods/namespaces")
+  @CrossOrigin("http://localhost:4200")
+  public Set<String> getNamespaceList() {
+    return client.getPodDetails().values().stream().map(PodDetails::getNamespace)
+        .collect(Collectors.toSet());
+  }
 }

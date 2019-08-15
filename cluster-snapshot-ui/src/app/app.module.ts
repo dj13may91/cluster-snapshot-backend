@@ -26,6 +26,7 @@ import {ChartComponent} from "./pod-data-container/chart.component";
 import {GoogleChartsModule} from "angular-google-charts";
 import { LogSearchPipe } from './server-component/log-search.pipe';
 import { DownloadComponentComponent } from './download-component/download-component.component';
+import { DashboardComponentComponent } from './dashboard-component/dashboard-component.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { DownloadComponentComponent } from './download-component/download-compon
     ChartComponent,
     LogSearchPipe,
     DownloadComponentComponent,
+    DashboardComponentComponent,
   ],
   imports: [
     BrowserModule,

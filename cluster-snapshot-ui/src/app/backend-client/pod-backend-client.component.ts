@@ -9,6 +9,7 @@ export class PodBackendClientComponent {
 
   public url = 'http://localhost:8082/';
   public pods = this.url + 'pods/';
+  public namespaceList = this.pods + 'namespaces/';
   public refreshPod = this.pods + 'refresh/';
 
   constructor(public http: HttpClient) {
@@ -33,5 +34,11 @@ export class PodBackendClientComponent {
     return this.http.get(this.refreshPod + podName, {
       responseType: 'text'
     });
+  }
+
+  getNamespaceList() {
+    return this.http.get(this.namespaceList, {
+      responseType: "json"
+    })
   }
 }
