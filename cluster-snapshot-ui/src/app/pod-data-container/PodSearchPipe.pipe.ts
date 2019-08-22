@@ -30,7 +30,7 @@ export class PodSearchPipePipe implements PipeTransform {
         });
       } else if (status === 'Running') {
         arr = arr.filter(pod => {
-          return PodSearchPipePipe.isReady(pod);
+          return PodSearchPipePipe.isReady(pod) && !pod.deleted;
         });
       } else if (status === 'Restarting') {
         arr = arr.filter(pod => {

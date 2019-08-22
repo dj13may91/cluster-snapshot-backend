@@ -3,10 +3,23 @@ package com.snapshot.cluster.controller;
 import com.snapshot.cluster.KubernetesClient;
 import com.snapshot.cluster.models.PodDetails;
 import com.snapshot.cluster.models.SocketLogsModal;
+import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
+import io.kubernetes.client.Configuration;
+import io.kubernetes.client.PodLogs;
+import io.kubernetes.client.models.V1Container;
+import io.kubernetes.client.models.V1Pod;
+import io.kubernetes.client.util.Config;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,51 +33,99 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Slf4j
 public class LiveLogsController {
 
+  private static Map<String, SocketLogsModal> loggingTracker = new HashMap<>();
   @Autowired
   SimpMessagingTemplate template;
-
   @Autowired
   KubernetesClient client;
 
-  Map<String, SocketLogsModal> loggingTracker = new HashMap<>();
-
-  @PostMapping("/sendLogs/{podName}")
-  @CrossOrigin("http://localhost:4200")
-  public ResponseEntity<String> sendLogs(@PathVariable String podName,
-      @RequestParam String sessionId) {
+  public boolean setUpSession(String sessionId, String podName) {
     boolean isARerun = false;
     if (loggingTracker.get(sessionId) != null) {
-      System.out.println("Restarting logging for session: " + sessionId + " for pod : " + podName);
+      log.info("Restarting logging for session: " + sessionId + " for pod : " + podName);
       loggingTracker.get(sessionId).setRunning(true);
       isARerun = true;
     } else {
       loggingTracker.put(sessionId, new SocketLogsModal(sessionId));
-      System.out.println("Restarting logging for session: " + sessionId + " for pod : " + podName);
+      log.info("Starting logging for session: " + sessionId + " for pod : " + podName);
     }
+    return isARerun;
+  }
+
+  @PostMapping("/sendLogs/{podName}")
+  @CrossOrigin("http://localhost:4200")
+  public void test(@PathVariable String podName, @RequestParam String sessionId) {
+    String topic = "/topic/" + sessionId;
+    log.info("topic created: " + topic);
+    boolean isARerun = setUpSession(sessionId, podName);
+    new Thread(() -> {
+      try {
+        ApiClient apiClient = Config.defaultClient();
+        Configuration.setDefaultApiClient(apiClient);
+//        CoreV1Api coreApi = new CoreV1Api(apiClient);
+        apiClient.getHttpClient().setReadTimeout(0, TimeUnit.SECONDS); // infinite timeout
+        PodLogs logs = new PodLogs();
+        PodDetails details = client.podDetails.get(podName);
+        V1Pod pod = client.getApi().readNamespacedPod(details.getPodName(), details.getNamespace(),
+            null, null, null);
+        InputStream is;
+        if (!isARerun) {
+          is = logs.streamNamespacedPodLog(details.getNamespace(), details.getPodName(),
+              ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, 100, false);
+        } else {
+          int sinceSeconds = loggingTracker.get(sessionId).getSeconds();
+          log.info("Sending logs for last " + sinceSeconds + " seconds");
+          is = logs.streamNamespacedPodLog(details.getNamespace(), details.getPodName(),
+              ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, sinceSeconds,
+              false);
+        }
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        while (loggingTracker.get(sessionId).isRunning()) {
+          if ((line = bufferedReader.readLine()) != null) {
+            template.convertAndSend(topic, line);
+          }
+        }
+        bufferedReader.close();
+      } catch (IOException | ApiException e) {
+        e.printStackTrace();
+      } finally {
+        template.convertAndSend(topic, "Session terminated !!");
+      }
+    }).start();
+  }
+
+
+  public ResponseEntity<String> sendLogs(@PathVariable String podName,
+      @RequestParam String sessionId) {
+    boolean isARerun = false;
+    setUpSession(sessionId, podName);
     PodDetails pod = client.podDetails.get(podName);
     String topic = "/topic/" + sessionId;
-    System.out.println("topic created: " + topic);
+    log.info("topic created: " + topic);
     boolean finalIsARerun = isARerun;
     Thread t = new Thread(() -> {
       String logLine = null;
       try {
         if (finalIsARerun) {
-          System.out.println("Sending logs for last " + loggingTracker.get(sessionId).getSeconds() + " seconds");
+          int sinceSeconds = loggingTracker.get(sessionId).getSeconds();
+          log.info("Sending logs for last " + sinceSeconds + " seconds");
           logLine = client.getApi()
               .readNamespacedPodLog(pod.getPodName(), pod.getNamespace(), null, null, null, null,
-                  null, loggingTracker.get(sessionId).getSeconds(), null, true);
+                  null, sinceSeconds, null, true);
 
         } else {
           logLine = client.getApi()
               .readNamespacedPodLog(pod.getPodName(), pod.getNamespace(), null, null, null, null,
-                  null, null, 1000, true);
+                  null, null, 500, true);
 
         }
         if (StringUtils.isNotBlank(logLine)) {
           this.template.convertAndSend(topic, logLine);
-          System.out.println("Sent all logs first " + loggingTracker.get(sessionId).getCount());
+          log.info("Sent all logs first " + loggingTracker.get(sessionId).getCount());
           loggingTracker.get(sessionId).count++;
         }
       } catch (ApiException e) {
@@ -80,7 +141,7 @@ public class LiveLogsController {
         }
         if (StringUtils.isNotBlank(logLine)) {
           this.template.convertAndSend(topic, logLine);
-          System.out.println(loggingTracker.get(sessionId).getCount());
+          log.info("log instance : " + loggingTracker.get(sessionId).getCount());
           loggingTracker.get(sessionId).count++;
         }
         try {
@@ -90,11 +151,19 @@ public class LiveLogsController {
         }
       }
       this.template.convertAndSend(topic, "Socket closed!!");
-      System.out.println("Socket closed!!");
+      log.info("Socket closed!!");
     });
     t.start();
-    System.out.println("Connection established successfully for pod: " + pod.getPodName());
+    log.info("Connection established successfully for pod: " + pod.getPodName());
     return new ResponseEntity<>("Connection established successfully", HttpStatus.CREATED);
+  }
+
+  @PostMapping("/pauseLogs/{podName}")
+  @CrossOrigin("http://localhost:4200")
+  public void pauseLogs(@PathVariable String podName, @RequestParam String sessionId) {
+    loggingTracker.get(sessionId).setRunning(false);
+    loggingTracker.get(sessionId).setLastStopTime(new Date());
+    log.info("Pausing logs for session : " + sessionId + " for pod " + podName);
   }
 
   @PostMapping("/stopLogs/{podName}")
@@ -102,7 +171,8 @@ public class LiveLogsController {
   public ResponseEntity<String> stopLogs(@PathVariable String podName,
       @RequestParam String sessionId) {
     loggingTracker.get(sessionId).setRunning(false);
-    System.out.println("Connection closed successfully for pod " + podName);
+    log.info("Connection closed successfully for pod " + podName);
+    loggingTracker.remove(sessionId);
     return new ResponseEntity<>("Connection closed successfully", HttpStatus.ACCEPTED);
   }
 

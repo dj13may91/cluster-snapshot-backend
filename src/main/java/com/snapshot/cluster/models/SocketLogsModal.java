@@ -26,7 +26,7 @@ public class SocketLogsModal {
     } else if (age >= (60 * 60)) {
       age = age / 3600;
       System.out.println(age + " hours ?? ");
-      return (int) (age * (60 * 60 * 24));
+      return (int) (age * (60 * 60));
     } else if (age > 60) {
       age = age / 60;
       System.out.println(age + " minutes");

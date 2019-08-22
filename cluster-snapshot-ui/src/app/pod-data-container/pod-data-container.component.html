@@ -70,7 +70,10 @@
 
     </span>
     <div id="{{pod.podName.split('.')[0]}}" class="collapse">
-      <span><b>{{pod.podCommand}}</b></span>
+      <span>
+        <b>{{pod.podCommand}}</b>
+        <i style="float: right; margin-right: 10%" class="fa fa-info" [ngbTooltip]="podInfo(pod)"></i>
+      </span>
       <span *ngIf="pod.restarts > 0"><br><b>Number of restarts: {{pod.restarts}}</b></span>
       <span *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></span>
       <code class="modal-content" style="max-height: 500px;max-width: 90%; overflow-y: auto">

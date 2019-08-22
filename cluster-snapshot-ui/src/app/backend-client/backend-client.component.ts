@@ -12,6 +12,7 @@ export class BackendClientComponent implements OnInit {
 
   public url = 'http://localhost:8082/';
   public openSocket = this.url + 'sendLogs/';
+  public pauseSocket = this.url + 'pauseLogs/';
   public closeSocket = this.url +  'stopLogs/';
   public clusterCommands = this.url + 'commands/';
   public commandOutput = this.clusterCommands + 'output/';
@@ -48,6 +49,13 @@ export class BackendClientComponent implements OnInit {
       responseType: 'text'
     });
     // return this.http.get(this.openSocket + podName);
+  }
+
+  pauseLogs(podName: string, sessionId: string) {
+    let httpParams = new HttpParams().append('sessionId', sessionId);
+    return this.http.post(this.pauseSocket + podName, httpParams, {
+      responseType: 'text'
+    });
   }
 
   stopLogs(podName: string, sessionId: string) {
