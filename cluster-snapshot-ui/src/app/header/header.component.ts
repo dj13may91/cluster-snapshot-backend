@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {BackendClientComponent} from "../backend-client/backend-client.component";
-import {SnapshotService} from "../shared/snapshot.service";
+import {BackendClientComponent} from '../backend-client/backend-client.component';
+import {SnapshotService} from '../shared/snapshot.service';
 
 @Component({
   selector: 'app-header',

@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
-import "rxjs-compat/add/operator/map";
-import "rxjs-compat/add/operator/catch";
-import {RandomIdGenerator} from "../shared/random-id-generator";
+import {HttpClient, HttpParams} from '@angular/common/http';
+import 'rxjs-compat/add/operator/map';
+import 'rxjs-compat/add/operator/catch';
 
 @Component({
   selector: 'app-backend-client',
@@ -13,13 +12,13 @@ export class BackendClientComponent implements OnInit {
   public url = 'http://localhost:8082/';
   public openSocket = this.url + 'sendLogs/';
   public pauseSocket = this.url + 'pauseLogs/';
-  public closeSocket = this.url +  'stopLogs/';
+  public closeSocket = this.url + 'stopLogs/';
   public clusterCommands = this.url + 'commands/';
   public commandOutput = this.clusterCommands + 'output/';
   public refreshCommandOutput = this.clusterCommands + 'refresh/';
 
   constructor(public http: HttpClient) {
-    console.log(this.http.get("http://localhost:8080/health"));
+    console.log(this.http.get('http://localhost:8080/health'));
   }
 
   ngOnInit() {
@@ -30,39 +29,37 @@ export class BackendClientComponent implements OnInit {
   }
 
   getCommandOutput(command: string) {
-    let httpParams = new HttpParams().append('command', command);
+    const httpParams = new HttpParams().append('command', command);
     return this.http.post(this.commandOutput, httpParams, {
       responseType: 'text'
     });
-  };
+  }
 
   refreshClusterCommandLogs(command: string) {
-    let httpParams = new HttpParams().append('command', command);
+    const httpParams = new HttpParams().append('command', command);
     return this.http.post(this.refreshCommandOutput, httpParams, {
       responseType: 'text'
     });
-  };
+  }
 
   startLogs(podName: string, sessionId: string) {
-    let httpParams = new HttpParams().append('sessionId', sessionId);
+    const httpParams = new HttpParams().append('sessionId', sessionId);
     return this.http.post(this.openSocket + podName, httpParams, {
       responseType: 'text'
     });
-    // return this.http.get(this.openSocket + podName);
   }
 
   pauseLogs(podName: string, sessionId: string) {
-    let httpParams = new HttpParams().append('sessionId', sessionId);
+    const httpParams = new HttpParams().append('sessionId', sessionId);
     return this.http.post(this.pauseSocket + podName, httpParams, {
       responseType: 'text'
     });
   }
 
   stopLogs(podName: string, sessionId: string) {
-    let httpParams = new HttpParams().append('sessionId', sessionId);
+    const httpParams = new HttpParams().append('sessionId', sessionId);
     return this.http.post(this.closeSocket + podName, httpParams, {
       responseType: 'text'
     });
-    // return this.http.get(this.closeSocket + podName);
   }
 }

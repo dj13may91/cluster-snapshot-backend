@@ -1,5 +1,5 @@
-import {HttpClient} from "@angular/common/http";
-import {Component} from "@angular/core";
+import {HttpClient} from '@angular/common/http';
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'app-backend-client',
@@ -38,7 +38,7 @@ export class PodBackendClientComponent {
 
   getNamespaceList() {
     return this.http.get(this.namespaceList, {
-      responseType: "json"
-    })
+      responseType: 'json'
+    });
   }
 }

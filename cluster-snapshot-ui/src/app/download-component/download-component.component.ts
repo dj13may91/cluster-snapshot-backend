@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core';
-import {of} from "rxjs";
-import {PodService} from "../pod-data-container/pod.service";
-import {ClusterServices} from "../cluster-services/ClusterServices";
-import {ClusterCommand} from "../cluster-commands/cluster-command";
-import {RandomIdGenerator} from "../shared/random-id-generator";
+import {of} from 'rxjs';
+import {PodService} from '../pod-data-container/pod.service';
+import {ClusterServices} from '../cluster-services/ClusterServices';
+import {ClusterCommand} from '../cluster-commands/cluster-command';
+import {RandomIdGenerator} from '../shared/random-id-generator';
 
 
 @Component({
@@ -85,7 +85,7 @@ export class DownloadComponentComponent {
     const fileType = arg.fileName.indexOf('.html') > -1 ? 'application/pdf' : 'text/plain';
     element.setAttribute('href', `data:${fileType};charset=utf-16,${encodeURIComponent(arg.text)}`);
     element.setAttribute('download', arg.fileName);
-    const event = new MouseEvent("click");
+    const event = new MouseEvent('click');
     element.dispatchEvent(event);
   }
 

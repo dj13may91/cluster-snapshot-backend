@@ -1,9 +1,10 @@
-//https://www.tutorialspoint.com/angular_googlecharts/angular_googlecharts_environment_setup.html
+// https://www.tutorialspoint.com/angular_googlecharts/angular_googlecharts_environment_setup.html
 
 import {Component, Input} from '@angular/core';
-import {SnapshotService} from "../shared/snapshot.service";
+import {SnapshotService} from '../shared/snapshot.service';
 
 @Component({
+  // tslint:disable-next-line:component-selector
   selector: 'chart-component',
   templateUrl: './chart.component.html'
 })
@@ -21,9 +22,10 @@ export class ChartComponent {
     }
   };
   width = 320;
+
   // height = 400;
 
-  constructor(private snapshot: SnapshotService){
+  constructor(private snapshot: SnapshotService) {
     this.data = snapshot.podStatusChart;
     window.setInterval(() => {
       this.data = snapshot.podStatusChart;

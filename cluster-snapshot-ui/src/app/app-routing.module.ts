@@ -1,10 +1,10 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
-import {ClusterCommandsComponent} from "./cluster-commands/cluster-commands.component";
-import {PodDataContainerComponent} from "./pod-data-container/pod-data-container.component";
-import {ClusterServicesComponent} from "./cluster-services/cluster-services.component";
-import {ServerComponentComponent} from "./server-component/server-component.component";
-import {DashboardComponentComponent} from "./dashboard-component/dashboard-component.component";
+import {ClusterCommandsComponent} from './cluster-commands/cluster-commands.component';
+import {PodDataContainerComponent} from './pod-data-container/pod-data-container.component';
+import {ClusterServicesComponent} from './cluster-services/cluster-services.component';
+import {ServerComponentComponent} from './server-component/server-component.component';
+import {DashboardComponentComponent} from './dashboard-component/dashboard-component.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},

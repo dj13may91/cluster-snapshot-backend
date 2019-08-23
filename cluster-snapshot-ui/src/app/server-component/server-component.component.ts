@@ -51,6 +51,7 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
     // earlier Stomp.over method is now client ?
     this.stompClient = StompJS.Stomp.over(socket);
     this.stompClient.reconnect_delay = 5000;
+    // tslint:disable-next-line:variable-name
     const _this = this;
     this.stompClient.connect({}, (frame) => {
       _this.setConnected(true);
@@ -64,15 +65,15 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
       (response) => {
         console.log('response', response);
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
-          'Live logs for' + this.pod.podName + ', Connection established!!'))
+          'Live logs for' + this.pod.podName + ', Connection established!!'));
       },
       (error: HttpErrorResponse) => {
         if (error.statusText !== 'OK') {
-          this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error establishing connection'))
+          this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error establishing connection'));
           console.log('error', error);
         } else {
           this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
-            'Live logs for' + this.pod.podName + ', Connection established!!'))
+            'Live logs for' + this.pod.podName + ', Connection established!!'));
         }
       }
     );
@@ -89,7 +90,7 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
 
   onLogChangeScrollToBottom(duration = 3000) {
     window.clearInterval(this.autoScroll);
-    this.autoScroll = window.setInterval( () => {
+    this.autoScroll = window.setInterval(() => {
       const elem = document.getElementById('logModal');
       elem.scrollTop = elem.scrollHeight;
     }, duration);
@@ -110,21 +111,23 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
         // if (error.statusText !== 'OK') {
         console.log('error', error);
         // }
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Connection closed for session: ' + this.sessionId));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
+          'Connection closed for session: ' + this.sessionId));
       });
   }
 
 
   pauseConnection() {
     this.backend.pauseLogs(this.pod.podName, this.sessionId).subscribe((response) => {
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Web socket connection paused'))
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Web socket connection paused'));
         console.log('Pausing connection for session: ' + this.sessionId, response);
       },
       (error) => {
         // if (error.statusText !== 'OK') {
         console.log('error', error);
         // }
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Connection paused for session: ' + this.sessionId));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
+          'Connection paused for session: ' + this.sessionId));
       });
     this.pauseSetup();
   }

@@ -1,13 +1,15 @@
 import {Component, Input, ViewEncapsulation} from '@angular/core';
 import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
-import {PodService} from "../pod-data-container/pod.service";
+import {PodService} from '../pod-data-container/pod.service';
 
 @Component({
+  // tslint:disable-next-line:component-selector
   selector: 'ngbd-modal-options',
   templateUrl: './model-component.html',
   encapsulation: ViewEncapsulation.None,
   styleUrls: ['./modal-component.css']
 })
+// tslint:disable-next-line:component-class-suffix
 export class NgbdModalOptions {
   closeResult: string;
 
@@ -26,7 +28,7 @@ export class NgbdModalOptions {
   }
 
   openWindowCustomClass(content) {
-    this.modalService.open(content, {size: "lg", windowClass: 'dark-modal'});
+    this.modalService.open(content, {size: 'lg', windowClass: 'dark-modal'});
   }
 
   openSm(content) {
@@ -46,6 +48,6 @@ export class NgbdModalOptions {
   }
 
   openScrollableContent(longContent) {
-    this.modalService.open(longContent, {windowClass: "setScrollBehavior()"});
+    this.modalService.open(longContent, {windowClass: 'setScrollBehavior()'});
   }
 }

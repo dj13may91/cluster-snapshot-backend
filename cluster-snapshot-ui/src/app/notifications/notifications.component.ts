@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {SnapshotService} from "../shared/snapshot.service";
-import {NotificationModel} from "../shared/NotificationModel";
+import {SnapshotService} from '../shared/snapshot.service';
+import {NotificationModel} from '../shared/NotificationModel';
 
 @Component({
   selector: 'app-notifications',
@@ -24,10 +24,11 @@ export class NotificationsComponent implements OnInit {
   }
 
   onCloseNew() {
-    if (this.snapshot.readNotifications.length == 0)
+    if (this.snapshot.readNotifications.length === 0) {
       this.snapshot.readNotifications.push(this.snapshot.newNotifications[this.index]);
-    else
+    } else {
       this.snapshot.readNotifications.unshift(this.snapshot.newNotifications[this.index]);
+    }
     this.snapshot.newNotifications.splice(this.index, 1);
   }
 }
