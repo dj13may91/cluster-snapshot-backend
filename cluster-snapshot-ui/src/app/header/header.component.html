@@ -1,6 +1,7 @@
 <nav class="navbar navbar-expand-md navbar-light" style="background-color: #e3f2fd;">
   <a class="navbar-brand" routerLink="/home">
-    <img style="max-height: 30px" src='https://upload.wikimedia.org/wikipedia/en/0/00/Kubernetes_%28container_engine%29.png'>
+    <img alt="" style="max-height: 30px"
+         src='https://upload.wikimedia.org/wikipedia/en/0/00/Kubernetes_%28container_engine%29.png'>
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse"
           data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -10,14 +11,21 @@
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-
-      <!--      <li routerLinkActive="active" class="nav-item"><a class="nav-link" routerLink="/all">-->
-      <!--        View all</a></li>-->
       <li routerLinkActive="active" class="nav-item"><a class="nav-link" routerLink="/pods">Pods</a>
       </li>
       <li routerLinkActive="active" class="nav-item"><a class="nav-link" routerLink="/services">Services</a>
       </li>
       <li routerLinkActive="active" class="nav-item"><a class="nav-link" routerLink="/dashboards">Dashboards</a>
+      </li>
+
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button"
+           aria-haspopup="true" aria-expanded="false">{{snapshot.context}}</a>
+        <div class="dropdown-menu">
+          <h6 class="dropdown-header">Select Context</h6>
+          <a [ngClass]="{active: (ctx === snapshot.context)}" class="dropdown-item"
+             *ngFor="let ctx of contextList" (click)="setContext(ctx)" href="#">{{ctx}}</a>
+        </div>
       </li>
     </ul>
   </div>

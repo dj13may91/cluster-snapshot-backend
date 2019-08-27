@@ -1,5 +1,9 @@
 package com.snapshot.cluster;
 
+import static com.snapshot.cluster.constants.ClusterCommands.CURRENT_CONTEXT;
+import static com.snapshot.cluster.constants.ClusterCommands.KUBE_CONFIG_FILE;
+
+import com.snapshot.cluster.constants.ClusterCommands;
 import com.snapshot.cluster.models.PodDetails;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
@@ -28,27 +32,15 @@ public class KubernetesClient {
 
   static ApiClient defaultClient;
 
-  static {
-    try {
-      defaultClient = Config.defaultClient();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-
   public Map<String, PodDetails> podDetails = new ConcurrentHashMap<>();
   public ConcurrentHashMap<String, String> podLogs = new ConcurrentHashMap<>();
   //  @Autowired
   TerminalInstance instance = new TerminalInstance();
-  boolean runLog = true;
   private DumperOptions options;
   private CoreV1Api api;
 
   KubernetesClient() throws IOException {
-    api = new CoreV1Api(defaultClient);
-    options = new DumperOptions();
-    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-    options.setPrettyFlow(true);
+    setDefaultClient();
   }
 
   public static void deletePod(String podName) throws ApiException, IOException {
@@ -85,22 +77,33 @@ public class KubernetesClient {
     }
   }
 
+  public void setDefaultClient() {
+    try {
+      defaultClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
+      api = new CoreV1Api(defaultClient);
+      options = new DumperOptions();
+      options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+      options.setPrettyFlow(true);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
   @PostConstruct
   public void getLogEnvDeploymentOfPods() throws IOException, ApiException {
     try {
       List<V1Pod> v1Pods = api
           .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null)
           .getItems();
-      List<PodDetails> podDetails = new ArrayList<>(createPodObjects1(v1Pods).values());
+      List<PodDetails> podDetails = new ArrayList<>(createPodObjects(v1Pods, false).values());
       log.info("Running " + podDetails.size() + " pods.");
-    } catch (IOException e) {
+    } catch (Exception e) {
       log.error("##### ERROR : " + e.getMessage());
       e.printStackTrace();
     }
   }
 
-  public Map<String, PodDetails> createPodObjects1(List<V1Pod> v1Pods) throws IOException {
-
+  public Map<String, PodDetails> createPodObjects(List<V1Pod> v1Pods, boolean hardRefresh) {
     Set<String> podNameSet = new ConcurrentSkipListSet<>(podDetails.keySet());
     v1Pods.forEach(v1Pod -> {
       PodDetails pod = new PodDetails(v1Pod);
@@ -113,21 +116,25 @@ public class KubernetesClient {
       log.warn("Pod " + podName + " is deleted!");
     });
 
-    generatePodLogs();
+    generatePodLogs(hardRefresh);
     return podDetails;
   }
 
-  public void refreshPodDetails() throws ApiException, IOException {
+  public void refreshPodDetails(boolean hardRefresh) throws ApiException, IOException {
+    if (hardRefresh) {
+      this.podDetails.clear();
+      this.podLogs.clear();
+    }
     List<V1Pod> v1Pods = api
         .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
-    createPodObjects1(v1Pods);
+    createPodObjects(v1Pods, hardRefresh);
   }
 
-  private void generatePodLogs() {
+  private void generatePodLogs(boolean hardRefresh) {
     Thread podLogThread = new Thread(() -> {
       podDetails.keySet().parallelStream().forEach(podName -> {
         try {
-          if (StringUtils.isBlank(podLogs.get(podName))) {
+          if (StringUtils.isBlank(podLogs.get(podName)) || !hardRefresh) {
             podDetails.get(podName).setLogs(getPodLog(podDetails.get(podName)));
             podLogs.put(podName, podDetails.get(podName).getLogs());
             log.info("POD: generated logs for " + podName);

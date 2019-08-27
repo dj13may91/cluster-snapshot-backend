@@ -1,5 +1,8 @@
 package com.snapshot.cluster.controller;
 
+import static com.snapshot.cluster.constants.ClusterCommands.CURRENT_CONTEXT;
+import static com.snapshot.cluster.constants.ClusterCommands.KUBE_CONFIG_FILE;
+
 import com.snapshot.cluster.KubernetesClient;
 import com.snapshot.cluster.models.PodDetails;
 import com.snapshot.cluster.models.SocketLogsModal;
@@ -63,9 +66,8 @@ public class LiveLogsController {
     boolean isARerun = setUpSession(sessionId, podName);
     new Thread(() -> {
       try {
-        ApiClient apiClient = Config.defaultClient();
+        ApiClient apiClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
         Configuration.setDefaultApiClient(apiClient);
-//        CoreV1Api coreApi = new CoreV1Api(apiClient);
         apiClient.getHttpClient().setReadTimeout(0, TimeUnit.SECONDS); // infinite timeout
         PodLogs logs = new PodLogs();
         PodDetails details = client.podDetails.get(podName);
@@ -74,7 +76,7 @@ public class LiveLogsController {
         InputStream is;
         if (!isARerun) {
           is = logs.streamNamespacedPodLog(details.getNamespace(), details.getPodName(),
-              ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, 100, false);
+              ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, 1500, false);
         } else {
           int sinceSeconds = loggingTracker.get(sessionId).getSeconds();
           log.info("Sending logs for last " + sinceSeconds + " seconds");

@@ -1,10 +1,10 @@
 import 'rxjs/Rx';
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {BackendClientComponent} from "../backend-client/backend-client.component";
-import {ClusterCommand} from "./cluster-command";
-import {HttpErrorResponse} from "@angular/common/http";
-import {SnapshotService} from "../shared/snapshot.service";
-import {NotificationModel} from "../shared/NotificationModel";
+import {BackendClientComponent} from '../backend-client/backend-client.component';
+import {ClusterCommand} from './cluster-command';
+import {HttpErrorResponse} from '@angular/common/http';
+import {SnapshotService} from '../shared/snapshot.service';
+import {NotificationModel} from '../shared/NotificationModel';
 
 @Component({
   selector: 'app-cluster-commands',
@@ -19,7 +19,7 @@ export class ClusterCommandsComponent implements OnInit {
 
   constructor(public backend: BackendClientComponent, public snapshot: SnapshotService) {
     if (this.snapshot.clusterCommandList) {
-      console.log("found old cluster commands")
+      console.log('found old cluster commands');
       this.clusterCommandList = this.snapshot.clusterCommandList;
     } else {
       this.backend.getClusterCommands().subscribe(
@@ -52,7 +52,7 @@ export class ClusterCommandsComponent implements OnInit {
       (response: string) => this.clusterCommandList[index].log = response,
       (error: HttpErrorResponse) => {
         command.log = error.message;
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, "Error fetching cluster logs"));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error fetching cluster logs'));
       });
   }
 
@@ -62,11 +62,11 @@ export class ClusterCommandsComponent implements OnInit {
     this.backend.refreshClusterCommandLogs(command.commandValue).subscribe(
       (response: string) => {
         this.clusterCommandList[index].log = response;
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, "Fetching logs for " + command.commandName));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Fetching logs for ' + command.commandName));
       },
       (error: HttpErrorResponse) => {
         command.log = error.message;
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, "Error fetching logs for " + command.commandName));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error fetching logs for ' + command.commandName));
       });
   }
 

@@ -1,11 +1,13 @@
-package com.snapshot.cluster;
+package com.snapshot.cluster.constants;
 
 import com.snapshot.cluster.models.ConfigMaps;
 import com.snapshot.cluster.models.PodDetails;
 import com.snapshot.cluster.models.Services;
 import java.util.Map;
 import java.util.TreeMap;
+import lombok.Setter;
 
+@Setter
 public class ClusterCommands {
 
   public static final String CLUSTER_NAME = "kubectl config current-context";
@@ -21,7 +23,9 @@ public class ClusterCommands {
   public static final String GET_NODE_MEMORY_DETAILS = "kubectl top nodes";
   public static final String GET_PERSISTENT_VOLUMES = "kubectl get pvc --all-namespaces";
   public static final String GET_DEPLOYMENTS = "kubectl get deployments --all-namespaces";
-
+  public static String CURRENT_CONTEXT = "p22-k8s-key";
+  public static String KUBE_CONFIG_FILE = "C:\\Users\\djain\\IdeaProjects\\cluster-snapshot-backend\\src\\main\\java\\kubeconfigs\\";
+  public static String CONFIG_SETTING = " --kubeconfig " + KUBE_CONFIG_FILE;
   public static Map<String, String> clusterCommandsMap = new TreeMap<>();
 
   static {

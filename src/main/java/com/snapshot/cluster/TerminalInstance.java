@@ -1,5 +1,8 @@
 package com.snapshot.cluster;
 
+import static com.snapshot.cluster.constants.ClusterCommands.CONFIG_SETTING;
+import static com.snapshot.cluster.constants.ClusterCommands.CURRENT_CONTEXT;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class TerminalInstance {
 
   public StringBuilder getCommandOutput(String command) throws IOException {
+    command = command + CONFIG_SETTING + CURRENT_CONTEXT;
     BufferedReader reader = getBIS(command);
     String line;
     StringBuilder output = new StringBuilder();

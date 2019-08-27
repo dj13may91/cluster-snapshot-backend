@@ -9,6 +9,7 @@ import {NotificationModel} from './NotificationModel';
 })
 export class SnapshotService {
 
+  public context = 'N/A';
   public clusterCommandList: ClusterCommand[];
   public podList: PodService[];
   public clusterServiceList: ClusterServices[];

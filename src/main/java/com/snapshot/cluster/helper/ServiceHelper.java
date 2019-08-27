@@ -1,13 +1,14 @@
 package com.snapshot.cluster.helper;
 
-import com.snapshot.cluster.ClusterCommands;
 import com.snapshot.cluster.KubernetesClient;
 import com.snapshot.cluster.TerminalInstance;
+import com.snapshot.cluster.constants.ClusterCommands;
 import com.snapshot.cluster.models.Services;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import lombok.Data;
@@ -22,12 +23,24 @@ import org.springframework.stereotype.Component;
 public class ServiceHelper {
 
   private static final String SVC_CMD = "kubectl describe svc %s -n %s";
-  private static String ingressIp;
+  private static String INGRESS_IP;
   @Autowired
   KubernetesClient client;
   @Autowired
   TerminalInstance instance;
   private ConcurrentHashMap<String, Services> serviceDetails = new ConcurrentHashMap<>();
+
+  public Map<String, Services> getServiceDetails() {
+    if (serviceDetails.isEmpty()) {
+      setServices();
+      try {
+        Thread.sleep(2500);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    return serviceDetails;
+  }
 
   @PostConstruct
   public void setServices() {
@@ -45,10 +58,10 @@ public class ServiceHelper {
                   .toString());
             } catch (Exception e1) {
               svc.setLogs(svc.getName() + "<b>Can not read logs for " + svc.getName() + " </b>");
-              log.error("Error generating logs for service: " + svcName);
+              log.error("Error Service: generating logs for: " + svcName);
             }
             serviceDetails.put(ClusterCommands.getCommandToDescribeService(svc), svc);
-            log.info("Finished Creating logs for service: " + svcName);
+            log.info("Service: finished Creating logs for: " + svcName);
           }
         });
       } catch (Exception e) {
@@ -58,7 +71,7 @@ public class ServiceHelper {
     svcThread.start();
   }
 
-  public List<Services> createServiceObjects(BufferedReader reader) throws IOException {
+  private List<Services> createServiceObjects(BufferedReader reader) throws IOException {
     String line;
     int count = 0;
     List<Services> servicesListDetails = new ArrayList<>();
@@ -69,7 +82,7 @@ public class ServiceHelper {
         if (services.getName().toLowerCase().contains("ingress")
             && services.getName().toLowerCase().contains("nginx")) {
           System.out.println("---Setting ingress ip to :" + services.getClusterIp());
-          ingressIp = services.getClusterIp();
+          INGRESS_IP = services.getClusterIp();
         }
       }
       count++;

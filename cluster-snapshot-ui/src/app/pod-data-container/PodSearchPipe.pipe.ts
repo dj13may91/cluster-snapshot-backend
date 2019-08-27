@@ -1,16 +1,23 @@
 import {Pipe, PipeTransform} from '@angular/core';
-import {PodService} from "./pod.service";
+import {PodService} from './pod.service';
 
 @Pipe({
   name: 'PodSearchPipe'
 })
 export class PodSearchPipePipe implements PipeTransform {
 
+  static isReady(pod: PodService): boolean {
+    const split = pod.ready.split('/');
+    return split[0] === split[1];
+  }
+
   transform(items: PodService[], searchText: string, namespace: string, status: string): PodService[] {
-    if (!items) return [];
+    if (!items) {
+      return [];
+    }
     let arr = items;
 
-    if (namespace != 'all') {
+    if (namespace !== 'all') {
       arr = arr.filter(pod => {
         return pod.namespace === namespace;
       });
@@ -23,7 +30,7 @@ export class PodSearchPipePipe implements PipeTransform {
       });
     }
 
-    if (status != 'all') {
+    if (status !== 'all') {
       if (status === 'Deleted') {
         arr = arr.filter(pod => {
           return pod.deleted;
@@ -39,11 +46,6 @@ export class PodSearchPipePipe implements PipeTransform {
       }
     }
     return arr;
-  }
-
-  static isReady(pod: PodService): boolean {
-    const split = pod.ready.split("/");
-    return split[0] === split[1];
   }
 
 }

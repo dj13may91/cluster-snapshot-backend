@@ -14,6 +14,9 @@ export class BackendClientComponent implements OnInit {
   public pauseSocket = this.url + 'pauseLogs/';
   public closeSocket = this.url + 'stopLogs/';
   public clusterCommands = this.url + 'commands/';
+  public clusterContextList = this.url + 'context/list/';
+  public contextSet = this.url + 'context/';
+  public contextCurrent = this.url + 'context/current';
   public commandOutput = this.clusterCommands + 'output/';
   public refreshCommandOutput = this.clusterCommands + 'refresh/';
 
@@ -22,6 +25,22 @@ export class BackendClientComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  getCurrentContext() {
+    return this.http.get(this.contextCurrent, {
+      responseType: 'text'
+    });
+  }
+
+  getContextSet() {
+    return this.http.get(this.clusterContextList);
+  }
+
+  setContext(currentContext: string) {
+    return this.http.post(this.contextSet + currentContext, {
+      responseType: 'text'
+    });
   }
 
   getClusterCommands() {

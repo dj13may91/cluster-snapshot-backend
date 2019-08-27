@@ -1,6 +1,7 @@
 package com.snapshot.cluster.WIP;
 
 import com.google.common.io.ByteStreams;
+import com.snapshot.cluster.constants.ClusterCommands;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.Configuration;
@@ -10,6 +11,7 @@ import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Container;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.util.Config;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,16 +32,13 @@ public class Test {
   static SimpMessagingTemplate template;
 
   public static void main(String[] args) throws IOException, ApiException, InterruptedException {
-    ApiClient client = Config.defaultClient();
-    Configuration.setDefaultApiClient(client);
-    CoreV1Api coreApi = new CoreV1Api(client);
-    client.getHttpClient().setReadTimeout(0, TimeUnit.SECONDS); // infinite timeout
-    PodLogs logs = new PodLogs();
-    V1Pod pod = coreApi.readNamespacedPod("soar-rule-service-88585bdff-h544x", "soar", null, null, null);
-    InputStream is = logs.streamNamespacedPodLog("soar", "soar-rule-service-88585bdff-h544x", ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, 15, false);
-    IOUtils.copy(is, System.out);
+    File folder = new File(ClusterCommands.KUBE_CONFIG_FILE);
+    String[] files = folder.list();
 
-    System.out.println("disconnected");
+    for (String file : files)
+    {
+      System.out.println(file);
+    }
   }
 
   public static void tailLogs(PodLogs logs, InputStream is)
@@ -73,6 +72,24 @@ public class Test {
 
   static byte[] createBuffer() {
     return new byte[BUFFER_SIZE];
+  }
+
+  public void clientTest() throws ApiException, IOException {
+    ApiClient client = Config.fromConfig(
+        "C:\\Users\\djain\\IdeaProjects\\cluster-snapshot-backend\\src\\main\\java\\kubeconfigs\\p07-eng-in03");// .defaultClient();
+    Configuration.setDefaultApiClient(client);
+    CoreV1Api coreApi = new CoreV1Api(client);
+    client.getHttpClient().setReadTimeout(0, TimeUnit.SECONDS); // infinite timeout
+    System.out.println(coreApi.listNamespace(null, null, null, null, null, null, null, null, null));
+
+    PodLogs logs = new PodLogs();
+    V1Pod pod = coreApi
+        .readNamespacedPod("soar-rule-service-88585bdff-h544x", "soar", null, null, null);
+    InputStream is = logs.streamNamespacedPodLog("soar", "soar-rule-service-88585bdff-h544x",
+        ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, 15, false);
+    IOUtils.copy(is, System.out);
+
+    System.out.println("disconnected");
   }
 
   public void pfTest() throws IOException, ApiException, InterruptedException {
