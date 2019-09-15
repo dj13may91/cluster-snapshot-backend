@@ -1,4 +1,4 @@
-package com.snapshot.cluster.Sockets;
+package com.snapshot.cluster.sockets;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

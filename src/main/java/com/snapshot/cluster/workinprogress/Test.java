@@ -1,7 +1,5 @@
-package com.snapshot.cluster.WIP;
+package com.snapshot.cluster.workinprogress;
 
-import com.google.common.io.ByteStreams;
-import com.snapshot.cluster.constants.ClusterCommands;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.Configuration;
@@ -11,13 +9,11 @@ import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Container;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.util.Config;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -32,30 +28,16 @@ public class Test {
   static SimpMessagingTemplate template;
 
   public static void main(String[] args) throws IOException, ApiException, InterruptedException {
-    File folder = new File(ClusterCommands.KUBE_CONFIG_FILE);
-    String[] files = folder.list();
+    ApiClient defaultClient = Config.defaultClient();
+    CoreV1Api api = new CoreV1Api(defaultClient);
 
-    for (String file : files)
-    {
-      System.out.println(file);
-    }
-  }
-
-  public static void tailLogs(PodLogs logs, InputStream is)
-      throws IOException, ApiException {
-    try {
-      ByteStreams.copy(is, System.out);
-    } catch (SocketTimeoutException ex) {
-      ex.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    System.out.println(api.getApiClient().getBasePath());
+    System.out.println(api.getApiClient().getJSON().getGson());
   }
 
   public static long copy(InputStream from, OutputStream to) throws IOException {
     byte[] buf = createBuffer();
     long total = 0;
-    System.out.println("request");
     while (true) {
       int r = from.read(buf);
       System.out.print(r);

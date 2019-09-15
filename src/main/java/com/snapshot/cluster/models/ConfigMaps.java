@@ -5,10 +5,10 @@ import lombok.Data;
 @Data
 public class ConfigMaps {
 
-  String namespace;
-  String name;
-  String data;
-  String age;
+  private String namespace;
+  private String name;
+  private String data;
+  private String age;
 
   public ConfigMaps(String[] split) {
     int index = 0;
@@ -31,6 +31,7 @@ public class ConfigMaps {
             this.setAge(currentLine);
             index++;
             break;
+          default: break;
         }
       }
     }

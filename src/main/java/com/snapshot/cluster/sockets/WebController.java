@@ -1,4 +1,4 @@
-package com.snapshot.cluster.Sockets;
+package com.snapshot.cluster.sockets;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;

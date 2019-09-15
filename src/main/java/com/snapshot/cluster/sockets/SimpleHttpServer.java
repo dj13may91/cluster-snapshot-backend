@@ -1,4 +1,4 @@
-package com.snapshot.cluster.Sockets;
+package com.snapshot.cluster.sockets;
 
 import java.io.IOException;
 import java.net.ServerSocket;

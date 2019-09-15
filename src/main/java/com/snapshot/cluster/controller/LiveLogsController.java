@@ -70,7 +70,7 @@ public class LiveLogsController {
         Configuration.setDefaultApiClient(apiClient);
         apiClient.getHttpClient().setReadTimeout(0, TimeUnit.SECONDS); // infinite timeout
         PodLogs logs = new PodLogs();
-        PodDetails details = client.podDetails.get(podName);
+        PodDetails details = client.getPodDetails().get(podName);
         V1Pod pod = client.getApi().readNamespacedPod(details.getPodName(), details.getNamespace(),
             null, null, null);
         InputStream is;
@@ -105,7 +105,7 @@ public class LiveLogsController {
       @RequestParam String sessionId) {
     boolean isARerun = false;
     setUpSession(sessionId, podName);
-    PodDetails pod = client.podDetails.get(podName);
+    PodDetails pod = client.getPodDetails().get(podName);
     String topic = "/topic/" + sessionId;
     log.info("topic created: " + topic);
     boolean finalIsARerun = isARerun;
@@ -128,7 +128,7 @@ public class LiveLogsController {
         if (StringUtils.isNotBlank(logLine)) {
           this.template.convertAndSend(topic, logLine);
           log.info("Sent all logs first " + loggingTracker.get(sessionId).getCount());
-          loggingTracker.get(sessionId).count++;
+          loggingTracker.get(sessionId).setCount(loggingTracker.get(sessionId).getCount() + 1);
         }
       } catch (ApiException e) {
         e.printStackTrace();
@@ -144,7 +144,7 @@ public class LiveLogsController {
         if (StringUtils.isNotBlank(logLine)) {
           this.template.convertAndSend(topic, logLine);
           log.info("log instance : " + loggingTracker.get(sessionId).getCount());
-          loggingTracker.get(sessionId).count++;
+          loggingTracker.get(sessionId).setCount(loggingTracker.get(sessionId).getCount() + 1);
         }
         try {
           Thread.sleep(950);

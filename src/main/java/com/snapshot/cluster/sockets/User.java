@@ -1,4 +1,4 @@
-package com.snapshot.cluster.Sockets;
+package com.snapshot.cluster.sockets;
 
 public class User {
   private String name;

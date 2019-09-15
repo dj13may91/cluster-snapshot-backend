@@ -1,4 +1,4 @@
-package com.snapshot.cluster.Sockets;
+package com.snapshot.cluster.sockets;
 
 // A Java program for a Server
 

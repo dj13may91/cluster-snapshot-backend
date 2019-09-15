@@ -5,10 +5,10 @@ import lombok.Data;
 @Data
 public class PodMemoryDetail {
 
-  String namespace;
-  String name;
-  String cpuCores;
-  String memoryInBytes;
+  private String namespace;
+  private String name;
+  private String cpuCores;
+  private String memoryInBytes;
 
   public PodMemoryDetail(String[] split) {
     int index = 0;
@@ -31,6 +31,7 @@ public class PodMemoryDetail {
             this.setMemoryInBytes(currentLine);
             index++;
             break;
+          default: break;
         }
       }
     }

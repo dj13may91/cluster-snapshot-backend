@@ -10,30 +10,29 @@ import lombok.Data;
 @Data
 public class PodDetails {
 
-  String namespace;
-  String podName;
-  String ready;
-  String status;
-  int restarts;
-  String age;
-  String IP;
-  String node;
-  String podMemory;
-  String colour = "blue";
-  String logs;
-  String icon = " ";
-  String podCommand = "";
-  boolean isDeleted = false;
-  UUID podId = UUID.randomUUID();
+  private String namespace;
+  private String podName;
+  private String ready;
+  private String status;
+  private int restarts;
+  private String age;
+  private String IP;
+  private String node;
+  private String podMemory;
+  private String colour = "blue";
+  private String logs;
+  private String icon = " ";
+  private String podCommand = "";
+  private boolean isDeleted = false;
+  private UUID podId = UUID.randomUUID();
 
   public PodDetails(V1Pod v1Pod) {
-    PodDetails podDetails = this;
     setPodName(v1Pod.getMetadata().getName());
     setNamespace(v1Pod.getMetadata().getNamespace());
     V1ContainerStatus conStatus = v1Pod.getStatus().getContainerStatuses().get(0);
     final int[] readyCount = {0};
     v1Pod.getStatus().getContainerStatuses()
-        .forEach(status -> readyCount[0] += status.isReady() ? 1 : 0);
+        .forEach(containerStatus -> readyCount[0] += containerStatus.isReady() ? 1 : 0);
 
     setReady(readyCount[0] + "/" + v1Pod.getStatus().getContainerStatuses().size());
 
@@ -47,6 +46,8 @@ public class PodDetails {
       setAge(age + "h");
     } else if (age >= 60) {
       age = age / 60;
+      setAge(age + "m");
+    } else {
       setAge(age + "s");
     }
 
@@ -62,56 +63,8 @@ public class PodDetails {
     setNode(v1Pod.getSpec().getNodeName());
   }
 
-  public PodDetails(String[] split) {
-    int index = 0;
-    for (String currentLine : split) {
-      if (!currentLine.trim().equals("")) {
-        switch (index) {
-          case 0:
-            this.setNamespace(currentLine);
-            index++;
-            break;
-          case 1:
-            this.setPodName(currentLine);
-            index++;
-            break;
-          case 2:
-            this.setReady(currentLine);
-            index++;
-            break;
-          case 3:
-            this.setStatus(currentLine);
-            index++;
-            break;
-          case 4:
-            try {
-              this.setRestarts(Integer.parseInt(currentLine));
-            } catch (Exception e) {
-              this.setRestarts(-1);
-            }
-            index++;
-            break;
-          case 5:
-            this.setAge(currentLine);
-            index++;
-            break;
-          case 6:
-            this.setIP(currentLine);
-            index++;
-            break;
-          case 7:
-            this.setNode(currentLine);
-            index++;
-            break;
-        }
-      }
-    }
-
-    this.setPodCommand(getGetPodLogsCommand());
-  }
-
-  public void UpdatePod(String memory_in_bytes) {
-    setPodMemory(memory_in_bytes);
+  public void updatePod(String memoryInBytes) {
+    setPodMemory(memoryInBytes);
     if (getRestarts() != 0) {
       setIcon(Tags.Restarts);
       setPodMemory(getPodMemory() + "<br><b>Number of restarts: " + getRestarts() + " </b>");
@@ -127,7 +80,7 @@ public class PodDetails {
         setIcon(getIcon() + Tags.LowMemoryUsage);
       }
     } catch (Exception e) {
-      System.out.println("Update Pod: " + podName.toString() + ". Exception" + e.getMessage());
+      System.out.println("Update Pod: " + podName + ". Exception" + e.getMessage());
       setIcon(getIcon() + Tags.MemoryNotFound);
     }
     if (!getStatus().equalsIgnoreCase("Running")) {

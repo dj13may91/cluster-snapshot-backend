@@ -7,9 +7,9 @@ import lombok.Setter;
 @Setter
 public class ClusterCommandModel {
 
-  public String commandName;
-  public String commandValue;
-  public String log;
+  private String commandName;
+  private String commandValue;
+  private String log;
 
   public ClusterCommandModel(String commandName, String commandValue) {
     this.commandName = commandName;

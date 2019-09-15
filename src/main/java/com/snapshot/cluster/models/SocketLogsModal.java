@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class SocketLogsModal {
 
-  public int count = 0;
+  private int count = 0;
   private boolean isRunning = true;
   private Date startTime = new Date();
   private Date lastStopTime = new Date();

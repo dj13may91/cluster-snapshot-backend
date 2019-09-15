@@ -30,17 +30,20 @@ import org.yaml.snakeyaml.DumperOptions;
 @Data
 public class KubernetesClient {
 
-  static ApiClient defaultClient;
+  private static ApiClient defaultClient;
 
-  public Map<String, PodDetails> podDetails = new ConcurrentHashMap<>();
-  public ConcurrentHashMap<String, String> podLogs = new ConcurrentHashMap<>();
-  //  @Autowired
-  TerminalInstance instance = new TerminalInstance();
+  private Map<String, PodDetails> podDetails = new ConcurrentHashMap<>();
+  private Map<String, String> podLogs = new ConcurrentHashMap<>();
+  private TerminalInstance instance = new TerminalInstance();
   private DumperOptions options;
   private CoreV1Api api;
 
   KubernetesClient() throws IOException {
-    setDefaultClient();
+    defaultClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
+    api = new CoreV1Api(defaultClient);
+    options = new DumperOptions();
+    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+    options.setPrettyFlow(true);
   }
 
   public static void deletePod(String podName) throws ApiException, IOException {
@@ -81,9 +84,6 @@ public class KubernetesClient {
     try {
       defaultClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
       api = new CoreV1Api(defaultClient);
-      options = new DumperOptions();
-      options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-      options.setPrettyFlow(true);
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -103,7 +103,7 @@ public class KubernetesClient {
     }
   }
 
-  public Map<String, PodDetails> createPodObjects(List<V1Pod> v1Pods, boolean hardRefresh) {
+  private Map<String, PodDetails> createPodObjects(List<V1Pod> v1Pods, boolean hardRefresh) {
     Set<String> podNameSet = new ConcurrentSkipListSet<>(podDetails.keySet());
     v1Pods.forEach(v1Pod -> {
       PodDetails pod = new PodDetails(v1Pod);

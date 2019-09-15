@@ -1,7 +1,7 @@
 package com.snapshot.cluster.controller;
 
 import com.snapshot.cluster.KubernetesClient;
-import com.snapshot.cluster.Sockets.WebController;
+import com.snapshot.cluster.sockets.WebController;
 import com.snapshot.cluster.TerminalInstance;
 import com.snapshot.cluster.constants.ClusterCommands;
 import com.snapshot.cluster.helper.ServiceHelper;
@@ -122,7 +122,15 @@ public class ClusterController {
     this.clusterCommandLogMap.clear();
     client.setDefaultClient();
     getClusterCommands();
-    client.refreshPodDetails(true);
+    new Thread(() -> {
+      try {
+        client.refreshPodDetails(true);
+      } catch (ApiException | IOException e) {
+        e.printStackTrace();
+      }
+    }).start();
+
+    new Thread(() -> serviceHelper.setServices()).start();
     ClusterCommands.clusterCommandsMap.keySet().parallelStream().forEach(
         command -> {
           try {

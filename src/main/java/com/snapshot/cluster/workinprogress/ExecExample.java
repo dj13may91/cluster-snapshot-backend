@@ -1,4 +1,4 @@
-package com.snapshot.cluster.WIP;
+package com.snapshot.cluster.workinprogress;
 
 import com.google.common.io.ByteStreams;
 import io.kubernetes.client.ApiClient;
@@ -7,8 +7,6 @@ import io.kubernetes.client.Configuration;
 import io.kubernetes.client.Exec;
 import io.kubernetes.client.util.Config;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -49,7 +47,7 @@ public class ExecExample {
 
     Exec exec = new Exec();
     boolean tty = System.console() != null;
-     final Process proc = exec.exec(namespace, podName, new String[]{"sh", "-c", "ls"}, true, tty);
+    final Process proc = exec.exec(namespace, podName, new String[]{"sh", "-c", "ls"}, true, tty);
 //    final Process proc =
 //        exec.exec(namespace, podName,
 //            commands.isEmpty() ? new String[]{"sh"} : commands.toArray(new String[commands.size()]),

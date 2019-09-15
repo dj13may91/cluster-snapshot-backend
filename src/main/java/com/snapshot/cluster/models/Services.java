@@ -48,6 +48,7 @@ public class Services {
             this.setAge(currentLine);
             index++;
             break;
+          default: break;
         }
       }
     }

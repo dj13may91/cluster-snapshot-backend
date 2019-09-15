@@ -1,4 +1,4 @@
-package com.snapshot.cluster.Sockets;// A Java program for a Client
+package com.snapshot.cluster.sockets;// A Java program for a Client
 import java.net.*;
 import java.io.*;
 

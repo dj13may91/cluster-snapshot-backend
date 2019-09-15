@@ -29,14 +29,14 @@ public class PodController {
   @GetMapping("/pods")
   @CrossOrigin("http://localhost:4200")
   public Collection<PodDetails> getPodDetails() throws IOException {
-    return client.podDetails.values();
+    return client.getPodDetails().values();
   }
 
   @GetMapping("/pods/{podName}")
   @CrossOrigin("http://localhost:4200")
   public String getPodLogs(@PathVariable String podName) throws IOException {
-    return client.podLogs.get(podName) == null ?
-        client.getPodLog(client.podDetails.get(podName)) : client.podLogs.get(podName);
+    return client.getPodLogs().get(podName) == null ?
+        client.getPodLog(client.getPodDetails().get(podName)) : client.getPodLogs().get(podName);
   }
 
   @GetMapping("/pods/refresh")
@@ -44,14 +44,14 @@ public class PodController {
   public Collection<PodDetails> refreshPodDetails() throws IOException, ApiException {
     log.info("Request to refresh podModal data!");
     client.refreshPodDetails(true);
-    return client.podDetails.values();
+    return client.getPodDetails().values();
   }
 
   @GetMapping("/pods/refresh/{podName}")
   @CrossOrigin("http://localhost:4200")
   public String refreshPodLog(@PathVariable String podName) throws IOException {
     log.info("POD: refreshing logs for " + podName);
-    return client.getPodLog(client.podDetails.get(podName));
+    return client.getPodLog(client.getPodDetails().get(podName));
   }
 
 
