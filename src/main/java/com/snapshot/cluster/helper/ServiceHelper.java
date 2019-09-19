@@ -2,92 +2,79 @@ package com.snapshot.cluster.helper;
 
 import com.snapshot.cluster.KubernetesClient;
 import com.snapshot.cluster.TerminalInstance;
-import com.snapshot.cluster.constants.ClusterCommands;
+import com.snapshot.cluster.models.PodDetails;
 import com.snapshot.cluster.models.Services;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import io.kubernetes.client.ApiException;
+import io.kubernetes.client.models.V1Service;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
 @Slf4j
 @Data
+@Service
 public class ServiceHelper {
 
-  private static final String SVC_CMD = "kubectl describe svc %s -n %s";
   private static String INGRESS_IP;
   @Autowired
-  KubernetesClient client;
+  private KubernetesClient client;
   @Autowired
-  TerminalInstance instance;
-  private ConcurrentHashMap<String, Services> serviceDetails = new ConcurrentHashMap<>();
+  private TerminalInstance instance;
+  private Map<String, Services> serviceDetails = new ConcurrentHashMap<>();
 
   public Map<String, Services> getServiceDetails() {
     if (serviceDetails.isEmpty()) {
-      setServices();
-      try {
-        Thread.sleep(2500);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+      generateServiceData();
     }
     return serviceDetails;
   }
 
   @PostConstruct
-  public void setServices() {
-    Thread svcThread = new Thread(() -> {
+  public void generateServiceData() {
+    new Thread(() -> {
       try {
-        BufferedReader reader = instance.getBIS(ClusterCommands.GET_ALL_SERVICES);
-        List<Services> serviceObjects = createServiceObjects(reader);
-        serviceObjects.stream().parallel().forEach(svc -> {
-          if (StringUtils.isNotBlank(svc.getName())) {
-            svc.setServiceCommand(String.format(SVC_CMD, svc.getName(), svc.getNamespace()));
-            String svcName = svc.getName();
-            try {
-              svc.setLogs(client.getApi()
-                  .readNamespacedService(svc.getName(), svc.getNamespace(), null, null, null)
-                  .toString());
-            } catch (Exception e1) {
-              svc.setLogs(svc.getName() + "<b>Can not read logs for " + svc.getName() + " </b>");
-              log.error("Error Service: generating logs for: " + svcName);
-            }
-            serviceDetails.put(ClusterCommands.getCommandToDescribeService(svc), svc);
-            log.info("Service: finished Creating logs for: " + svcName);
-          }
+        List<V1Service> serviceObjects = client.getApi()
+            .listServiceForAllNamespaces(null, null, null, null, null, null, null, null, null)
+            .getItems();
+        serviceObjects.parallelStream().forEach(svc -> {
+          Services services = createServiceObject(svc);
+          serviceDetails.put(services.getServiceCommand(), services);
         });
-      } catch (Exception e) {
-        log.error("error generating service logs");
+
+        log.info("Running " + serviceDetails.size() + " services");
+      } catch (ApiException e) {
+        e.printStackTrace();
       }
-    });
-    svcThread.start();
+    }).start();
   }
 
-  private List<Services> createServiceObjects(BufferedReader reader) throws IOException {
-    String line;
-    int count = 0;
-    List<Services> servicesListDetails = new ArrayList<>();
-    while ((line = reader.readLine()) != null) {
-      if (count > 0) {
-        Services services = new Services(line.split(" "));
-        servicesListDetails.add(services);
-        if (services.getName().toLowerCase().contains("ingress")
-            && services.getName().toLowerCase().contains("nginx")) {
-          System.out.println("---Setting ingress ip to :" + services.getClusterIp());
-          INGRESS_IP = services.getClusterIp();
-        }
-      }
-      count++;
+  private Services createServiceObject(V1Service service) {
+    Services svc = new Services();
+    svc.setName(service.getMetadata().getName());
+    svc.setNamespace(service.getMetadata().getNamespace());
+    svc.setClusterIp(service.getSpec().getClusterIP());
+    if (service.getSpec().getExternalIPs() != null) {
+      svc.setExternalIp(String.join(", ", service.getSpec().getExternalIPs()));
     }
-    return servicesListDetails;
-  }
+    svc.setType(service.getSpec().getType());
+    svc.setAge(PodDetails.getAge(service.getMetadata().getCreationTimestamp()));
+    svc.setPorts(service.getSpec().getPorts().parallelStream()
+        .map(port -> port.getNodePort() == null ? port.getPort() + "/" + port.getProtocol()
+            : port.getPort() + ":" + port.getNodePort() + "/" + port.getProtocol())
+        .collect(Collectors.joining(",")));
 
+    svc.setLogs(service.toString().replaceAll("class V1Service ", "")
+        .replaceAll("class V1ObjectMeta ", "")
+        .replaceAll("class V1ServiceSpec ", "")
+        .replaceAll("class V1ServicePort ", "")
+        .replaceAll("class V1ServiceStatus ", "")
+        .replaceAll("class V1LoadBalancerStatus ", ""));
+    return svc;
+  }
 }

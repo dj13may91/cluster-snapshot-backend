@@ -32,4 +32,10 @@ export class SnapshotService {
   public getNotificationCount() {
     return this.newNotifications.length + this.readNotifications.length;
   }
+
+  public getServiceName(name: string) {
+    let nameArr = name.split('-');
+    nameArr = nameArr.map(s => s.charAt(0).toUpperCase() + s.slice(1));
+    return nameArr.join(' ');
+  }
 }

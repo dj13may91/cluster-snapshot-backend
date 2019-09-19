@@ -14,5 +14,6 @@
 </ng-template>
 
 <button class="btn btn-sm blinking" (click)="openSocket(liveLogModal)"
-        [ngbTooltip]="'view live logs'"><i class="fa fa-video-camera" aria-hidden="true"></i>
+        data-toggle="tooltip" data-placement="left" title="View live logs">
+  <i class="fa fa-video-camera" aria-hidden="true"></i>
 </button>

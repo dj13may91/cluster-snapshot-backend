@@ -1,19 +1,23 @@
 package com.snapshot.cluster.models;
 
+import com.snapshot.cluster.constants.ClusterCommands;
 import lombok.Data;
 
 @Data
 public class Services {
 
-  String namespace;
-  String name;
-  String type;
-  String clusterIp;
-  String externalIp;
-  String ports;
-  String age;
-  String logs;
-  String serviceCommand;
+  private String namespace;
+  private String name;
+  private String type;
+  private String clusterIp;
+  private String externalIp;
+  private String ports;
+  private String age;
+  private String logs;
+  private String serviceCommand;
+
+  public Services() {
+  }
 
   public Services(String[] split) {
     int index = 0;
@@ -48,9 +52,27 @@ public class Services {
             this.setAge(currentLine);
             index++;
             break;
-          default: break;
+          default:
+            break;
         }
       }
     }
+  }
+
+  @Override
+  public String toString() {
+    return "namespace='" + namespace +
+        ", name='" + name +
+        ", type='" + type +
+        ", clusterIp='" + clusterIp +
+        ", externalIp='" + externalIp +
+        ", ports='" + ports +
+        ", age='" + age +
+        ", logs='" + logs +
+        ", serviceCommand='" + serviceCommand;
+  }
+
+  public String getServiceCommand() {
+    return ClusterCommands.getCommandToDescribeService(this);
   }
 }

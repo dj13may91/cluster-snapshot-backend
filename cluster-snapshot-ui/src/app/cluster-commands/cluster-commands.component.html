@@ -5,16 +5,32 @@
     <input type="text" placeholder="search here" [(ngModel)]="searchText">
   </div>
 
-  <div class="pad-bottom" *ngFor="let command of clusterCommandList | clusterSearch: searchText; let i = index">
-    <button type="button" class="btn btn-info btn-xs" data-toggle="collapse"
-            [attr.data-target]="'#' + command.commandName">{{command.commandValue}}</button>
-    <span style="float: right; margin-right: 7%">
-      <app-download-component [component]="command" [type]="'clustercommand'"></app-download-component>
-      <button class="btn btn-xs" data-toggle="open" type="button" (click)="refreshLogs(command)" [attr.data-target]="'#' + command.commandName">
-      <i class='fa fa-refresh' [ngbTooltip]="'Refresh logs'"></i></button>
-    </span>
-    <div id="{{command.commandName}}" class="collapse">
-      <pre class='modal-content'>{{ command.log }}</pre>
+  <div class="accordion" id="command-details">
+    <div class="card shadow-lg p-sm2 mb-1 bg-white rounded"
+         *ngFor="let cmd of clusterCommandList | clusterSearch: searchText; let i = index">
+      <div class="card-subtitle" id="headingOne">
+        <div style="display: flow; float: left;">
+          <h2 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                    [attr.data-target]="'#' + cmd.commandName + 'x'" aria-expanded="false">
+              {{cmd.commandValue}}
+            </button>
+          </h2>
+        </div>
+
+        <div style="display: flow; float: right;">
+          <app-download-component [component]="cmd"
+                                  [type]="'clustercommand'"></app-download-component>
+        </div>
+      </div>
+
+      <div id="{{cmd.commandName + 'x'}}" class="collapse ml-2" aria-labelledby="headingOne"
+           data-parent="#command-details">
+        <span class="badge badge-success">{{cmd.commandValue}}</span>
+        <div style="margin-left: auto">
+          <pre style="max-height: 350px;">{{ cmd.log }}</pre>
+        </div>
+      </div>
     </div>
   </div>
 </div>

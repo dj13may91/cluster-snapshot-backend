@@ -60,7 +60,7 @@ public class LiveLogsController {
 
   @PostMapping("/sendLogs/{podName}")
   @CrossOrigin("http://localhost:4200")
-  public void test(@PathVariable String podName, @RequestParam String sessionId) {
+  public void test(@PathVariable String podName, @RequestParam String sessionId ) {
     String topic = "/topic/" + sessionId;
     log.info("topic created: " + topic);
     boolean isARerun = setUpSession(sessionId, podName);
@@ -76,7 +76,7 @@ public class LiveLogsController {
         InputStream is;
         if (!isARerun) {
           is = logs.streamNamespacedPodLog(details.getNamespace(), details.getPodName(),
-              ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, 1500, false);
+              ((V1Container) pod.getSpec().getContainers().get(0)).getName(), null, 1000, false);
         } else {
           int sinceSeconds = loggingTracker.get(sessionId).getSeconds();
           log.info("Sending logs for last " + sinceSeconds + " seconds");

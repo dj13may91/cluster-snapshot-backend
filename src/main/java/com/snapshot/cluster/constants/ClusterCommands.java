@@ -13,7 +13,7 @@ public class ClusterCommands {
   public static final String CLUSTER_NAME = "kubectl config current-context";
   public static final String HELM_CHARTS_ALL_NAMESPACES = "helm ls --all";
   public static final String GET_ALL_PODS = "kubectl get pods --all-namespaces -o wide";
-  public static final String GET_ALL_PODS_SECA = "kubectl get pods -n seca";
+  public static final String GET_ALL_PODS_SECA = "kubectl get pods -n soar";
   public static final String GET_ALL_PVC = "kubectl get persistentvolumes";
   public static final String GET_ALL_NODES = "kubectl get nodes";
   public static final String GET_CLUSTER_INFO = "kubectl cluster-info";
@@ -23,6 +23,7 @@ public class ClusterCommands {
   public static final String GET_NODE_MEMORY_DETAILS = "kubectl top nodes";
   public static final String GET_PERSISTENT_VOLUMES = "kubectl get pvc --all-namespaces";
   public static final String GET_DEPLOYMENTS = "kubectl get deployments --all-namespaces";
+  public static final String SERVICE_CMD = "kubectl describe svc %s -n %s";
   public static String CURRENT_CONTEXT = "p22-k8s-key";
   public static String KUBE_CONFIG_FILE = "C:\\Users\\djain\\IdeaProjects\\cluster-snapshot-backend\\src\\main\\java\\kubeconfigs\\";
   public static String CONFIG_SETTING = " --kubeconfig " + KUBE_CONFIG_FILE;
@@ -32,7 +33,7 @@ public class ClusterCommands {
     clusterCommandsMap.put("clusterName", CLUSTER_NAME);
 //    clusterCommandsMap.put("helmChartsAllNamespaces", "helm ls --all");
     clusterCommandsMap.put("getAllPods", GET_ALL_PODS);
-    clusterCommandsMap.put("getAllPodsPlatform", "kubectl get pods -n seca");
+    clusterCommandsMap.put("getAllPodsPlatform", "kubectl get pods -n soar");
     clusterCommandsMap.put("getAllPVC", "kubectl get persistentvolumes");
     clusterCommandsMap.put("getAllNodes", "kubectl get nodes");
     clusterCommandsMap.put("getClusterInfo", "kubectl cluster-info");

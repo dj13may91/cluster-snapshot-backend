@@ -222,12 +222,12 @@ else
     fi
     wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
 
-    if command -v wget > /dev/null; then
+    if cmd -v wget > /dev/null; then
         if [ "$MVNW_VERBOSE" = true ]; then
           echo "Found wget ... using wget"
         fi
         wget "$jarUrl" -O "$wrapperJarPath"
-    elif command -v curl > /dev/null; then
+    elif cmd -v curl > /dev/null; then
         if [ "$MVNW_VERBOSE" = true ]; then
           echo "Found curl ... using curl"
         fi

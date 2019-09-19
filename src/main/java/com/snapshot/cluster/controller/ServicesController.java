@@ -28,7 +28,15 @@ public class ServicesController {
 
   @GetMapping("/services")
   @CrossOrigin("http://localhost:4200")
-  public Collection<Services> getPodDetails() throws IOException {
+  public Collection<Services> getPodDetails() {
     return serviceHelper.getServiceDetails().values();
   }
+
+  @GetMapping("/services/refresh")
+  @CrossOrigin("http://localhost:4200")
+  public Collection<Services> refreshPodDetails() {
+    serviceHelper.generateServiceData();
+    return serviceHelper.getServiceDetails().values();
+  }
+
 }

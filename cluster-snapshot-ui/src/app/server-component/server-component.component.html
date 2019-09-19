@@ -1,19 +1,19 @@
 <div class="container" style="font-size: small; display: flex; align-items: center">
-  <div style="float: left; width: 5%;">
-    <button class="btn btn-default bg-info" type="button" [disabled]="!disabled"
-            (click)="connect()" [ngbTooltip]="'Start live logs'">
-      <i class="fa fa-play fa-2x" aria-hidden="true"></i></button>
-  </div>
 
   <div class="container" style="width: 80%">
-    <code class="text-info">{{pod.podCommand}}</code>
+    <p class="text-info">{{pod.podCommand}}</p>
     <pre *ngIf="pod.restarts > 0" class="text-danger">Number of restarts: {{pod.restarts}}</pre>
     <p *ngIf="pod.podMemory"><b>Memory usage: {{pod.podMemory}}</b></p>
   </div>
 
-  <div style="float: right; width: 5%">
-    <button class="btn btn-default bg-warning" type="submit" [disabled]="disabled"
-            (click)="pauseConnection()" [ngbTooltip]="'Pause live logs'">
+  <div style="float: left; width: 5%;">
+    <button class="btn btn-sm bg-info" type="button" [disabled]="!disabled"
+            (click)="connect()" [ngbTooltip]="'Start live logs'">
+      <i class="fa fa-play fa-2x" aria-hidden="true"></i></button>
+  </div>
+  <div style="float: left; width: 5%">
+    <button class="btn btn-sm bg-warning" type="submit" [disabled]="disabled"
+            (click)="pauseConnection()" [ngbTooltip]="'Pause logs'">
       <i class="fa fa-eject fa-2x" aria-hidden="true"></i>
     </button>
   </div>
@@ -21,15 +21,14 @@
 
 <br>
 
-<div *ngIf="disabled" class="pad-bottom">
+<div class="pad-bottom">
   <input type="text" placeholder="search in logs" [(ngModel)]="searchText">
 </div>
 <div class="container badge-dark" id="logModal" style="overflow-y: auto; max-height: 450px">
   <div class="table table-striped" style="margin-top: 20px;">
     <tbody *ngFor="let logLine of logs | logSearch : searchText; let i = index">
     <tr style="font-size: 12px; color: aliceblue" *ngIf="logLine.trim().length > 1">
-      <span
-        [ngClass]="{'alert-danger': logLine.toLocaleLowerCase().indexOf('error') >= 0 && i != 0}">
+      <span [ngClass]="{'alert-danger': logLine.toLowerCase().indexOf('error') >= 0}">
         {{logLine}}</span>
     </tr>
     </tbody>

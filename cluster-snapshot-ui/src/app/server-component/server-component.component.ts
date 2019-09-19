@@ -88,17 +88,19 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
     });
   }
 
-  onLogChangeScrollToBottom(duration = 3000) {
-    window.clearInterval(this.autoScroll);
-    this.autoScroll = window.setInterval(() => {
-      const elem = document.getElementById('logModal');
-      elem.scrollTop = elem.scrollHeight;
-    }, duration);
+  onLogChangeScrollToBottom(duration = 2000) {
+    // window.clearInterval(this.autoScroll);
+    // this.autoScroll = window.setInterval(() => {
+    //   const elem = document.getElementById('logModal');
+    //   elem.scrollTop = elem.scrollHeight;
+    // }, duration);
   }
 
   showLogLine(message) {
     this.logs.push(...message.split('\n'));
     this.onLogChangeScrollToBottom();
+    const elem = document.getElementById('logModal');
+    elem.scrollTop = elem.scrollHeight;
   }
 
   closeConnection() {

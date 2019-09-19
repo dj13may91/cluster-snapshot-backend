@@ -6,6 +6,7 @@ import io.kubernetes.client.models.V1Pod;
 import java.util.Date;
 import java.util.UUID;
 import lombok.Data;
+import org.joda.time.DateTime;
 
 @Data
 public class PodDetails {
@@ -36,31 +37,43 @@ public class PodDetails {
 
     setReady(readyCount[0] + "/" + v1Pod.getStatus().getContainerStatuses().size());
 
-    long age = (new Date().getTime() - v1Pod.getStatus().getStartTime().toDate().getTime()) / 1000;
+    setAge(getAge(v1Pod.getStatus().getStartTime()));
 
-    if (age >= (60 * 60 * 24)) {
-      age = age / (60 * 60 * 24);
-      setAge(age + "d");
-    } else if (age >= (60 * 60)) {
-      age = age / 3600;
-      setAge(age + "h");
-    } else if (age >= 60) {
-      age = age / 60;
-      setAge(age + "m");
-    } else {
-      setAge(age + "s");
-    }
-
-    if (conStatus.getState().getTerminated() != null) {
-      setStatus(conStatus.getLastState().getTerminated().getReason());
-    } else if (conStatus.getState().getRunning() != null) {
-      setStatus("Running");
-    } else if (conStatus.getState().getWaiting() != null) {
-      setStatus(conStatus.getState().getWaiting().getReason());
+    try {
+      if (conStatus.getState().getTerminated() != null) {
+        setStatus(conStatus.getLastState().getTerminated().getReason());
+      } else if (conStatus.getState().getRunning() != null) {
+        setStatus("Running");
+      } else if (conStatus.getState().getWaiting() != null) {
+        setStatus(conStatus.getState().getWaiting().getReason());
+      } else {
+        setStatus("Error generating status!");
+      }
+    }catch(Exception e){
+      setStatus("Error generating status!");
+      System.out.println(e.getMessage());
+      System.out.println(conStatus);
+      e.printStackTrace();
     }
     setIP(v1Pod.getStatus().getPodIP());
     setRestarts(conStatus.getRestartCount());
     setNode(v1Pod.getSpec().getNodeName());
+  }
+
+  public static String getAge(DateTime creationTime) {
+    long podAge = (new Date().getTime() - creationTime.toDate().getTime()) / 1000;
+    if (podAge >= (60 * 60 * 24)) {
+      podAge = podAge / (60 * 60 * 24);
+      return podAge + "d";
+    } else if (podAge >= (60 * 60)) {
+      podAge = podAge / 3600;
+      return podAge + "h";
+    } else if (podAge >= 60) {
+      podAge = podAge / 60;
+      return (podAge + "m");
+    } else {
+      return (podAge + "s");
+    }
   }
 
   public void updatePod(String memoryInBytes) {

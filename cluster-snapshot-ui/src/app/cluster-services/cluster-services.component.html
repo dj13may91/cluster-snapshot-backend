@@ -6,16 +6,43 @@
            [(ngModel)]="searchText">
   </div>
 
-  <div class="pad-bottom" *ngFor="let svc of clusterServiceList | clusterServices: searchText">
-    <button type="button" class="btn btn-info btn-xs" data-toggle="collapse"
-            [attr.data-target]="'#' + svc.name">{{svc.serviceCommand}}</button>
+  <div class="accordion" id="service">
+    <div class="card shadow-lg p-sm2 mb-1 bg-white rounded"
+         *ngFor="let svc of clusterServiceList | clusterServices: searchText">
+      <div class="card-subtitle" id="headingOne">
+        <div style="float: left">
+          <h2 class="mb-0">
+            <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                    [attr.data-target]="'#' + svc.name" aria-expanded="false">
+              {{snapshot.getServiceName(svc.name)}}
+            </button>
+          </h2>
+        </div>
+        <div style="float: right">
+          <span class="badge badge-pill badge-dark m-sm-3">{{svc.namespace}}</span>
+          <span class="badge badge-light m-sm-2"><i class="fa fa-clock-o"></i>{{svc.age}}</span>
+          <span class="badge badge-pill badge-success m-sm-2" [ngbTooltip]="'Type'">{{svc.type}}</span>
+        </div>
+      </div>
 
-    <span style="float: right; margin-right: 7%">
-      <app-download-component [component]="svc" [type]="'clusterservices'"></app-download-component>
-    </span>
+      <div id="{{svc.name}}" class="collapse" aria-labelledby="headingOne" data-parent="#service">
+        <!-- Button trigger modal -->
 
-    <div id="{{svc.name}}" class="collapse">
-      <pre class="modal-content">{{ svc.logs }}</pre>
+        <div>
+          <span class="badge badge-pill badge-success m-sm-2" style="float-displace: block">{{svc.serviceCommand}}</span>
+          <span class="badge badge-pill badge-danger m-sm-2" [ngbTooltip]="'Cluster-IP'">{{svc.clusterIp}}</span>
+          <span *ngIf="svc.externalIp != null" class="badge badge-pill m-sm-2" [ngbTooltip]="'External-IP'">{{svc.externalIp}}</span>
+          <span class="ml-sm-2" *ngFor="let port of svc.ports.split(',')">
+            <span class="badge badge-warning mr-sm-1 align-middle">{{port}}</span>
+          </span>
+
+          <app-download-component  style="float: right" [component]="svc" [type]="'clusterservices'"></app-download-component>
+        </div>
+        <div class="card-body">
+          <pre style="max-height: 400px;">{{ svc.logs }}</pre>
+        </div>
+
+      </div>
     </div>
   </div>
 

@@ -68,10 +68,10 @@ public class ClusterController {
   public ResponseEntity<String> getCommandOutput(@RequestParam String command) {
     try {
       if (clusterCommandLogMap.get(command) == null) {
-        log.warn("CLUSTER COMMAND logs not found, returning logs for command: " + command);
+        log.warn("CLUSTER COMMAND logs not found, returning logs for cmd: " + command);
         clusterCommandLogMap.put(command, String.valueOf(instance.getCommandOutput(command)));
       } else {
-        log.info("CLUSTER COMMAND: logs found , returning logs for command: " + command);
+        log.info("CLUSTER COMMAND: logs found , returning logs for cmd: " + command);
       }
       return new ResponseEntity<>(clusterCommandLogMap.get(command), HttpStatus.OK);
     } catch (IOException e) {
@@ -87,7 +87,7 @@ public class ClusterController {
   public ResponseEntity<String> refreshCommandLog(@RequestParam String command) throws IOException {
     try {
       clusterCommandLogMap.put(command, String.valueOf(instance.getCommandOutput(command)));
-      log.info("Refreshing logs for command: " + command);
+      log.info("Refreshing logs for cmd: " + command);
       return new ResponseEntity<>(clusterCommandLogMap.get(command), HttpStatus.OK);
     } catch (IOException e) {
       e.printStackTrace();
@@ -130,7 +130,7 @@ public class ClusterController {
       }
     }).start();
 
-    new Thread(() -> serviceHelper.setServices()).start();
+    new Thread(() -> serviceHelper.generateServiceData()).start();
     ClusterCommands.clusterCommandsMap.keySet().parallelStream().forEach(
         command -> {
           try {

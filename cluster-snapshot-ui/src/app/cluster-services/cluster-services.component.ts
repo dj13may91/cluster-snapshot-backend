@@ -15,10 +15,14 @@ export class ClusterServicesComponent implements OnInit {
 
 
   constructor(public backend: ClusterServiceBackendClient, public snapshot: SnapshotService) {
+  }
+
+  ngOnInit() {
     if (this.snapshot.clusterServiceList && this.snapshot.clusterServiceList.length > 0) {
       console.log('found old cluster services');
       this.clusterServiceList = this.snapshot.clusterServiceList;
     } else {
+      console.log('Fetching cluster services');
       this.backend.getServices().subscribe(
         (clusterServiceList: ClusterServices[]) => {
           console.log(clusterServiceList);
@@ -30,11 +34,16 @@ export class ClusterServicesComponent implements OnInit {
     }
   }
 
-  ngOnInit() {
-  }
-
-  refreshLogs(service: ClusterServices) {
-
+  refreshLogs() {
+    console.log('Refreshing cluster services');
+    this.backend.refreshServices().subscribe(
+      (clusterServiceList: ClusterServices[]) => {
+        console.log(clusterServiceList);
+        this.clusterServiceList = this.sortArray(clusterServiceList);
+        this.snapshot.clusterServiceList = clusterServiceList;
+      },
+      (error) => console.error(error)
+    );
   }
 
   private sortArray(arr: ClusterServices[]) {
@@ -45,6 +54,16 @@ export class ClusterServicesComponent implements OnInit {
         return -1;
       }
     });
+  }
+
+  getServiceString(svc: ClusterServices) {
+    return 'Namespace: ' + svc.namespace + '\n' +
+      'Name: ' + svc.name + '\n' +
+      'Type: ' + svc.type + '\n' +
+      'ClusterIp: ' + svc.clusterIp + '\n' +
+      'ExternalIp: ' + svc.externalIp + '\n' +
+      'Ports: ' + svc.ports + '\n' +
+      'Age: ' + svc.age ;
   }
 
 }

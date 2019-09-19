@@ -224,12 +224,12 @@ export class PodDataContainerComponent implements OnInit {
   }
 
   podInfo(pod: PodService) {
-    return ', ready=' + pod.ready + '\n' +
-      ', status=' + pod.status + '\'\n' +
-      ', restarts=' + pod.restarts + '\n' +
-      ', age=' + pod.age + '\'\n' +
-      ', IP=' + pod.IP + '\'\n' +
-      ', node=' + pod.node + '\'\n' +
-      ', podMemory=' + pod.podMemory;
+    return 'ready=' + pod.ready + '\n' +
+      'status=' + pod.status + '\n' +
+      'restarts=' + pod.restarts + '\n' +
+      'age=' + pod.age + '\n' +
+      'IP=' + pod.IP + '\n' +
+      'node=' + pod.node + '\n' +
+      'podMemory=' + (pod.podMemory ? pod.podMemory : 'Not found');
   }
 }

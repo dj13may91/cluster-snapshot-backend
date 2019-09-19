@@ -30,7 +30,7 @@ import org.yaml.snakeyaml.DumperOptions;
 @Data
 public class KubernetesClient {
 
-  private static ApiClient defaultClient;
+  public static ApiClient defaultClient;
 
   private Map<String, PodDetails> podDetails = new ConcurrentHashMap<>();
   private Map<String, String> podLogs = new ConcurrentHashMap<>();
@@ -38,7 +38,7 @@ public class KubernetesClient {
   private DumperOptions options;
   private CoreV1Api api;
 
-  KubernetesClient() throws IOException {
+  public KubernetesClient() throws IOException {
     defaultClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
     api = new CoreV1Api(defaultClient);
     options = new DumperOptions();
@@ -48,10 +48,6 @@ public class KubernetesClient {
 
   public static void deletePod(String podName) throws ApiException, IOException {
     ExtensionsV1beta1Api api = new ExtensionsV1beta1Api(defaultClient);
-//    System.out.println(api.listNamespacedDeployment("soar", null, null,
-//        null, null, null, null,
-//        null, null, null)
-//        .getItems().get(2));
     KubernetesClient kc = new KubernetesClient();
     try {
       kc.getApi()
@@ -90,7 +86,7 @@ public class KubernetesClient {
   }
 
   @PostConstruct
-  public void getLogEnvDeploymentOfPods() throws IOException, ApiException {
+  public void generatePodRelatedData() throws IOException, ApiException {
     try {
       List<V1Pod> v1Pods = api
           .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null)
