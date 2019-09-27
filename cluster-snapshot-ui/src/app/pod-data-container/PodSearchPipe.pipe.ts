@@ -11,7 +11,7 @@ export class PodSearchPipePipe implements PipeTransform {
     return split[0] === split[1];
   }
 
-  transform(items: PodService[], searchText: string, namespace: string, status: string): PodService[] {
+  transform(items: PodService[], searchText: string, namespace: string, status: string, nodeName: string): PodService[] {
     if (!items) {
       return [];
     }
@@ -30,6 +30,12 @@ export class PodSearchPipePipe implements PipeTransform {
       });
     }
 
+    if (nodeName !== 'all') {
+      arr = arr.filter(pod => {
+        return pod.node === nodeName;
+      });
+    }
+
     if (status !== 'all') {
       if (status === 'Deleted') {
         arr = arr.filter(pod => {
@@ -39,7 +45,7 @@ export class PodSearchPipePipe implements PipeTransform {
         arr = arr.filter(pod => {
           return PodSearchPipePipe.isReady(pod) && !pod.deleted;
         });
-      } else if (status === 'Restarting') {
+      } else if (status === 'Not ready') {
         arr = arr.filter(pod => {
           return !PodSearchPipePipe.isReady(pod);
         });

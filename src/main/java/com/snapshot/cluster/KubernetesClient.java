@@ -91,8 +91,8 @@ public class KubernetesClient {
       List<V1Pod> v1Pods = api
           .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null)
           .getItems();
-      List<PodDetails> podDetails = new ArrayList<>(createPodObjects(v1Pods, false).values());
-      log.info("Running " + podDetails.size() + " pods.");
+      List<PodDetails> podDetailsList = new ArrayList<>(createPodObjects(v1Pods, false).values());
+      log.info("Running " + podDetailsList.size() + " pods.");
     } catch (Exception e) {
       log.error("##### ERROR : " + e.getMessage());
       e.printStackTrace();
@@ -116,7 +116,7 @@ public class KubernetesClient {
     return podDetails;
   }
 
-  public void refreshPodDetails(boolean hardRefresh) throws ApiException, IOException {
+  public void refreshPodDetails(boolean hardRefresh) throws ApiException {
     if (hardRefresh) {
       this.podDetails.clear();
       this.podLogs.clear();

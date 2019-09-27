@@ -19,6 +19,9 @@
         </div>
 
         <div style="display: flow; float: right;">
+          <button class="btn btn-outline-primary mt-2 mb-1 mr-sm-2" (click)="refreshLogs(cmd)"
+                  data-toggle="tooltip" data-placement="left" title="Refresh logs">
+            <i class='fa fa-refresh'></i></button>
           <app-download-component [component]="cmd"
                                   [type]="'clustercommand'"></app-download-component>
         </div>

@@ -38,7 +38,7 @@ export class ClusterCommandsComponent implements OnInit {
   }
 
   getClusterCommandLogs() {
-    for (let command of this.clusterCommandList) {
+    for (const command of this.clusterCommandList) {
       if (!command.log) {
         this.getLogsOfCommand(command);
       }

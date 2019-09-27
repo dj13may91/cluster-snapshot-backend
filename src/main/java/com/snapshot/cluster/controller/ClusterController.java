@@ -1,11 +1,11 @@
 package com.snapshot.cluster.controller;
 
 import com.snapshot.cluster.KubernetesClient;
-import com.snapshot.cluster.sockets.WebController;
 import com.snapshot.cluster.TerminalInstance;
 import com.snapshot.cluster.constants.ClusterCommands;
 import com.snapshot.cluster.helper.ServiceHelper;
 import com.snapshot.cluster.models.ClusterCommandModel;
+import com.snapshot.cluster.sockets.WebController;
 import io.kubernetes.client.ApiException;
 import java.io.File;
 import java.io.IOException;
@@ -125,7 +125,7 @@ public class ClusterController {
     new Thread(() -> {
       try {
         client.refreshPodDetails(true);
-      } catch (ApiException | IOException e) {
+      } catch (ApiException e) {
         e.printStackTrace();
       }
     }).start();

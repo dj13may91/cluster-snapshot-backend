@@ -41,7 +41,7 @@ public class PodDetails {
 
     try {
       if (conStatus.getState().getTerminated() != null) {
-        setStatus(conStatus.getLastState().getTerminated().getReason());
+        setStatus(conStatus.getState().getTerminated().getReason());
       } else if (conStatus.getState().getRunning() != null) {
         setStatus("Running");
       } else if (conStatus.getState().getWaiting() != null) {

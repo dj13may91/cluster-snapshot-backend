@@ -7,23 +7,22 @@
   </div>
 
   <div style="float: left; width: 5%;">
-    <button class="btn btn-sm bg-info" type="button" [disabled]="!disabled"
+    <button class="btn btn-sm bg-info" type="button" *ngIf="disabled"
             (click)="connect()" [ngbTooltip]="'Start live logs'">
       <i class="fa fa-play fa-2x" aria-hidden="true"></i></button>
-  </div>
-  <div style="float: left; width: 5%">
-    <button class="btn btn-sm bg-warning" type="submit" [disabled]="disabled"
+    <button class="btn btn-sm bg-warning" type="submit" *ngIf="!disabled"
             (click)="pauseConnection()" [ngbTooltip]="'Pause logs'">
-      <i class="fa fa-eject fa-2x" aria-hidden="true"></i>
-    </button>
+      <i class="fa fa-pause fa-2x" aria-hidden="true"></i></button>
   </div>
 </div>
 
 <br>
 
 <div class="pad-bottom">
-  <input type="text" placeholder="search in logs" [(ngModel)]="searchText">
+  <input  style="float: left" type="text" placeholder="search in logs" [(ngModel)]="searchText">
+  <i style="float: right; margin-right: 3%; color: midnightblue" class="fa fa-arrow-down" aria-hidden="true"></i>
 </div>
+
 <div class="container badge-dark" id="logModal" style="overflow-y: auto; max-height: 450px">
   <div class="table table-striped" style="margin-top: 20px;">
     <tbody *ngFor="let logLine of logs | logSearch : searchText; let i = index">

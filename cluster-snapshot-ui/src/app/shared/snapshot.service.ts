@@ -19,7 +19,7 @@ export class SnapshotService {
   public autoRefreshEnabled = true;
   public podStatusChart = [
     ['Demo_Running', 45.0],
-    ['Restarting', 26.8],
+    ['Not ready', 26.8],
     ['Deleted', 12.8]];
 
   constructor() {
@@ -33,7 +33,7 @@ export class SnapshotService {
     return this.newNotifications.length + this.readNotifications.length;
   }
 
-  public getServiceName(name: string) {
+  public getServiceNameDisplayLabel(name: string) {
     let nameArr = name.split('-');
     nameArr = nameArr.map(s => s.charAt(0).toUpperCase() + s.slice(1));
     return nameArr.join(' ');

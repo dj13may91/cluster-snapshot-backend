@@ -1,4 +1,5 @@
 <div class="pad-left">
+
   <div style="display: flex;">
     <div class="card text-center" style="width: 300px;">
       <div class="card-body">
@@ -15,7 +16,7 @@
           <label class="custom-control-label" for="customSwitch1"></label>
         </div>
         <span style="float: right" id="refreshDuration">
-          Last refreshed: <i class="fa fa-refresh fa-spin fa-fw"></i></span>
+          Last update: <i class="fa fa-refresh fa-spin fa-fw"></i></span>
       </div>
     </div>
 
@@ -42,19 +43,28 @@
         <option *ngFor="let status of podStatusList" value="{{status}}">{{status}}</option>
       </select>
     </div>
+
+    <div class="dropdown" style="margin-left: 25px;" (focus)="setNodeFilter($event)" (change)="setNodeFilter($event)">
+      <select class="form-control-sm">
+        <option class="dropdown-item small" selected value="all">All {{nodeNameDetails.size}} Nodes</option>
+        <option class="dropdown-item small " *ngFor="let node of nodeNameDetails.keys()" value="{{node}}">
+          {{node + ' (' + nodeNameDetails.get(node) + ' pods)'}}
+        </option>
+      </select>
+    </div>
   </div>
 
 
   <div class="accordion" id="pod-details">
     <div class="card shadow-lg p-sm2 mb-1 bg-white rounded"
-         *ngFor="let pod of podList | PodSearchPipe: searchText: namespaceFilter: podStatusFilter">
+         *ngFor="let pod of podList | PodSearchPipe: searchText: namespaceFilter: podStatusFilter: nodeFilter"
+         [ngClass]="{'border border-warning': !isReady(pod), 'border border-danger': pod.deleted}">
       <div class="card-subtitle" id="headingOne">
         <div style="display: flow; float: left">
           <h2 class="mb-0">
             <button *ngIf="!pod.deleted" [ngClass]="{'pod-not-ready': !isReady(pod)}"
-                    class="btn btn-link collapsed" aria-expanded="false"
-                    data-toggle="collapse" type="button"
-                    [attr.data-target]="'#' + pod.podName.split('.')[0] ">
+                    class="btn btn-link collapsed" aria-expanded="false" data-toggle="collapse"
+                    type="button" [attr.data-target]="'#' + pod.podName.split('.')[0] ">
               {{pod.podName}}
             </button>
             <button *ngIf="pod.deleted" class="btn collapsed" data-toggle="collapse" type="button"
@@ -82,7 +92,7 @@
           <i *ngIf="pod.deleted" style="color: tomato" class="fa fa-trash fa-fw"
              data-toggle="tooltip" data-placement="left" title="Pod deleted in + {{pod.age}}"></i>
           <i *ngIf="!isReady(pod)" class="fa fa-paint-brush" style="color: orange"
-             data-toggle="tooltip" data-placement="left" title="Pod not ready"></i>
+             data-toggle="tooltip" data-placement="left" title="Pod not ready ({{pod.status}})"></i>
         </div>
       </div>
 
@@ -90,12 +100,16 @@
            data-parent="#pod-details">
         <div class="card">
           <div>
-            <span
-              class="badge badge-pill badge-success m-md-2">{{pod.podCommand}}</span>
+            <span class="badge badge-pill badge-success m-md-2">{{pod.podCommand}}</span>
             <span *ngIf="pod.restarts > 0"
                   class="badge badge-pill badge-danger mr-sm-2">Restarts: {{pod.restarts}}</span>
             <span *ngIf="pod.podMemory"
                   class="badge badge-pill badge-success mr-sm-2">Memory: {{pod.podMemory}}</span>
+
+            <span [ngbTooltip]="'Parent node'" style="float: right"
+                  class="badge badge-pill badge-primary m-md-2">{{pod.node}}</span>
+            <span [ngbTooltip]="'Pod IP'" style="float: right"
+                  class="badge badge-dark m-md-2">{{pod.ip}}</span>
             <pre style="max-height: 400px;" class="modal-content">{{ pod.logs }}</pre>
           </div>
         </div>

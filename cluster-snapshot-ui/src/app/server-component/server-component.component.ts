@@ -43,6 +43,7 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
   }
 
   connect() {
+    this.disabled = true;
     this.searchText = null;
     this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
       'Live logs for' + this.pod.podName + ', Connection established!!'));
@@ -120,6 +121,7 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
 
 
   pauseConnection() {
+    this.disabled = false;
     this.backend.pauseLogs(this.pod.podName, this.sessionId).subscribe((response) => {
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Web socket connection paused'));
         console.log('Pausing connection for session: ' + this.sessionId, response);

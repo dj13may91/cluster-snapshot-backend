@@ -54,7 +54,7 @@ public class Tags {
     }
 
 //    public static String createIngressIpLink(ClusterDetails details) {
-//        return "<h3>" + Tags.BalanceScale + "Ingress IP : <a target='_blank' href='https://" +
+//        return "<h3>" + Tags.BalanceScale + "Ingress ip : <a target='_blank' href='https://" +
 //                details.ingressIp + "' style='color:hotpink' >" + details.ingressIp + "</a></h3>";
 //    }
 }

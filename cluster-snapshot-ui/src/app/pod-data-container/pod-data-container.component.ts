@@ -47,9 +47,11 @@ export class PodDataContainerComponent implements OnInit {
   public timerObj;
   public autoRefresh;
   public namespaceList;
-  public podStatusList = ['Running', 'Restarting', 'Deleted'];
+  public podStatusList = ['Running', 'Not ready', 'Deleted'];
   public namespaceFilter = 'all';
+  public nodeNameDetails = new Map<string, number>();
   private podStatusFilter = 'all';
+  private nodeFilter = 'all';
 
   static isReady(pod: PodService): boolean {
     const split = pod.ready.split('/');
@@ -171,6 +173,18 @@ export class PodDataContainerComponent implements OnInit {
   }
 
   private sortArray(arr: PodService[]) {
+    arr.forEach(pod => {
+      let count = this.nodeNameDetails.get(pod.node);
+      if (count) {
+        count++;
+        this.nodeNameDetails.set(pod.node, count);
+      } else {
+        this.nodeNameDetails.set(pod.node, 1);
+      }
+    });
+
+    this.nodeNameDetails = new Map([...this.nodeNameDetails.entries()].sort());
+
     return arr.sort((a: PodService, b: PodService) => {
       if (a.podName > b.podName) {
         return 1;
@@ -204,7 +218,7 @@ export class PodDataContainerComponent implements OnInit {
       } else {
         duration = age.toFixed(0) + ' sec';
       }
-      document.getElementById('refreshDuration').innerHTML = 'Last refreshed: ' + duration + ' ago';
+      document.getElementById('refreshDuration').innerHTML = 'Last update: ' + duration + ' ago';
     }, 10000);
   }
 
@@ -217,10 +231,14 @@ export class PodDataContainerComponent implements OnInit {
     console.log(this.namespaceFilter);
   }
 
-
   setPodStatusFilter(event) {
     this.podStatusFilter = event.target.value;
     console.log(this.podStatusFilter);
+  }
+
+  setNodeFilter(event) {
+    this.nodeFilter = event.target.value;
+    console.log(this.nodeFilter);
   }
 
   podInfo(pod: PodService) {
@@ -228,7 +246,7 @@ export class PodDataContainerComponent implements OnInit {
       'status=' + pod.status + '\n' +
       'restarts=' + pod.restarts + '\n' +
       'age=' + pod.age + '\n' +
-      'IP=' + pod.IP + '\n' +
+      'ip=' + pod.ip + '\n' +
       'node=' + pod.node + '\n' +
       'podMemory=' + (pod.podMemory ? pod.podMemory : 'Not found');
   }

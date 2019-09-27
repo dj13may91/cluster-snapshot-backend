@@ -6,7 +6,7 @@ export class PodService {
   public status: string;
   public restarts: number;
   public age: string;
-  public IP: string;
+  public ip: string;
   public node: string;
   public podMemory: string;
   public colour: string;
@@ -15,6 +15,7 @@ export class PodService {
   public podCommand: string;
   public deleted: boolean;
   public podId;
+
   constructor() {
   }
 

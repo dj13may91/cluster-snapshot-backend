@@ -28,11 +28,12 @@ public class Test {
   static SimpMessagingTemplate template;
 
   public static void main(String[] args) throws IOException, ApiException, InterruptedException {
-    ApiClient defaultClient = Config.defaultClient();
+    ApiClient defaultClient =  Config.fromConfig(
+        "C:\\Users\\djain\\IdeaProjects\\cluster-snapshot-backend\\src\\main\\java\\kubeconfigs\\p22-k8s-key");// .defaultClient();
     CoreV1Api api = new CoreV1Api(defaultClient);
-
-    System.out.println(api.getApiClient().getBasePath());
-    System.out.println(api.getApiClient().getJSON().getGson());
+    System.out.println(api.readNamespacedPod("gateway-55f98f4b64-bzhmr", "gateway" , null,null,null));
+//    System.out.println(api.getApiClient().getBasePath());
+//    System.out.println(api.getApiClient().getJSON().getGson());
   }
 
   public static long copy(InputStream from, OutputStream to) throws IOException {
