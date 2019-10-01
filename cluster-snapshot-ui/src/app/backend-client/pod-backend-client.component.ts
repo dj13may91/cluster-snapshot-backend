@@ -30,9 +30,9 @@ export class PodBackendClientComponent {
     return this.http.get(this.refreshPod);
   }
 
-  refreshPodLogs(podName: string) {
+  refreshPodData(podName: string) {
     return this.http.get(this.refreshPod + podName, {
-      responseType: 'text'
+      responseType: 'json'
     });
   }
 

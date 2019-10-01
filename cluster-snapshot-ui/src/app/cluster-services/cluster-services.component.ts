@@ -13,7 +13,6 @@ export class ClusterServicesComponent implements OnInit {
   public searchText: string;
   public clusterServiceList: ClusterServices[];
 
-
   constructor(public backend: ClusterServiceBackendClient, public snapshot: SnapshotService) {
   }
 
@@ -56,14 +55,8 @@ export class ClusterServicesComponent implements OnInit {
     });
   }
 
-  getServiceString(svc: ClusterServices) {
-    return 'Namespace: ' + svc.namespace + '\n' +
-      'Name: ' + svc.name + '\n' +
-      'Type: ' + svc.type + '\n' +
-      'ClusterIp: ' + svc.clusterIp + '\n' +
-      'ExternalIp: ' + svc.externalIp + '\n' +
-      'Ports: ' + svc.ports + '\n' +
-      'Age: ' + svc.age ;
+  public getServiceString(svc: ClusterServices) {
+    return SnapshotService.getServiceString(svc);
   }
 
 }

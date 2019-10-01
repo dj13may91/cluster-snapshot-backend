@@ -3,7 +3,9 @@ package com.snapshot.cluster.models;
 import com.snapshot.cluster.Tags;
 import io.kubernetes.client.models.V1ContainerStatus;
 import io.kubernetes.client.models.V1Pod;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import org.joda.time.DateTime;
@@ -26,6 +28,7 @@ public class PodDetails {
   private String podCommand = "";
   private boolean isDeleted = false;
   private UUID podId = UUID.randomUUID();
+  private List<Integer> containerPort = new ArrayList<>();
 
   public PodDetails(V1Pod v1Pod) {
     setPodName(v1Pod.getMetadata().getName());

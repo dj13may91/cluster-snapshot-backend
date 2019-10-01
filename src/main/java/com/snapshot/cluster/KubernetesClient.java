@@ -131,13 +131,13 @@ public class KubernetesClient {
       podDetails.keySet().parallelStream().forEach(podName -> {
         try {
           if (StringUtils.isBlank(podLogs.get(podName)) || !hardRefresh) {
-            podDetails.get(podName).setLogs(getPodLog(podDetails.get(podName)));
+            podDetails.get(podName).setLogs(refreshPod(podDetails.get(podName)).getLogs());
             podLogs.put(podName, podDetails.get(podName).getLogs());
             log.info("POD: generated logs for " + podName);
           } else {
             log.info("POD: found old logs for " + podName);
           }
-        } catch (IOException e) {
+        } catch (Exception e) {
           podDetails.get(podName).setLogs("Error reading podModal logs. " + e.getMessage());
         }
       });
@@ -146,8 +146,11 @@ public class KubernetesClient {
     podLogThread.start();
   }
 
-  public String getPodLog(PodDetails pod) throws IOException {
+  public PodDetails refreshPod(PodDetails pod) {
     try {
+      pod = new PodDetails(
+          api.readNamespacedPod(pod.getPodName(), pod.getNamespace(), null, null, null));
+      podDetails.put(pod.getPodName(), pod);
       pod.setLogs(api.readNamespacedPodLog(pod.getPodName(), pod.getNamespace(), null, null,
           null, null, null, null, 1000, true));
 
@@ -160,7 +163,7 @@ public class KubernetesClient {
     podLogs.put(pod.getPodName(),
         StringUtils.isBlank(pod.getLogs()) ? "Unable to get logs" : pod.getLogs());
     podDetails.get(pod.getPodName()).setLogs(podLogs.get(pod.getPodName()));
-    return pod.getLogs();
+    return pod;
   }
 
   public ConcurrentHashMap<String, String> getClusterDetails() {

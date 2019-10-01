@@ -3,7 +3,7 @@ import {of} from 'rxjs';
 import {PodService} from '../pod-data-container/pod.service';
 import {ClusterServices} from '../cluster-services/ClusterServices';
 import {ClusterCommand} from '../cluster-commands/cluster-command';
-import {RandomIdGenerator} from '../shared/random-id-generator';
+import {SnapshotService} from '../shared/snapshot.service';
 
 
 @Component({
@@ -31,22 +31,23 @@ export class DownloadComponentComponent {
 
   getPodLogs(component: PodService) {
     this.name = component.namespace + '.' + component.podName;
-    return component.logs;
+    return '<b>' + SnapshotService.getPodToString(component) + '</b>\n\n' + component.logs;
   }
 
   getServiceLogs(component: ClusterServices) {
     this.name = component.namespace + '.' + component.name;
-    return component.logs;
+    return '<b>' + SnapshotService.getServiceString(component) + '</b>\n\n' + component.logs;
   }
 
   getClusterCommandLogs(component: ClusterCommand) {
     this.name = component.commandName;
-    return component.log;
+    return '<b>' + component.commandValue + '</b>\n\n' + component.log;
   }
 
   validateUserData(component) {
     if (this.type.toLowerCase() === 'podservice') {
-      return of(this.getPodLogs(component));
+      return of(
+        this.getPodLogs(component));
     } else if (this.type.toLowerCase() === 'clusterservices') {
       return of(this.getServiceLogs(component));
     } else if (this.type.toLowerCase() === 'clustercommand') {

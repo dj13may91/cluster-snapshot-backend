@@ -25,17 +25,37 @@ export class SnapshotService {
   constructor() {
   }
 
-  public addNewNotification(notification: NotificationModel) {
-    this.newNotifications.unshift(notification);
+  public static getPodToString(pod: PodService) {
+    return 'ready=' + pod.ready + '\n' +
+      'status=' + pod.status + '\n' +
+      'restarts=' + pod.restarts + '\n' +
+      'age=' + pod.age + '\n' +
+      'ip=' + pod.ip + '\n' +
+      'node=' + pod.node + '\n' +
+      'podMemory=' + (pod.podMemory ? pod.podMemory : 'Not found');
   }
 
-  public getNotificationCount() {
-    return this.newNotifications.length + this.readNotifications.length;
+  public static getServiceString(svc: ClusterServices) {
+    return 'Namespace: ' + svc.namespace + '\n' +
+      'Name: ' + svc.name + '\n' +
+      'Type: ' + svc.type + '\n' +
+      'ClusterIp: ' + svc.clusterIp + '\n' +
+      'ExternalIp: ' + svc.externalIp + '\n' +
+      'Ports: ' + svc.ports + '\n' +
+      'Age: ' + svc.age;
   }
 
   public getServiceNameDisplayLabel(name: string) {
     let nameArr = name.split('-');
     nameArr = nameArr.map(s => s.charAt(0).toUpperCase() + s.slice(1));
     return nameArr.join(' ');
+  }
+
+  public addNewNotification(notification: NotificationModel) {
+    this.newNotifications.unshift(notification);
+  }
+
+  public getNotificationCount() {
+    return this.newNotifications.length + this.readNotifications.length;
   }
 }

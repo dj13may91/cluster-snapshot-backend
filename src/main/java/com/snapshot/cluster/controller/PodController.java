@@ -36,7 +36,8 @@ public class PodController {
   @CrossOrigin("http://localhost:4200")
   public String getPodLogs(@PathVariable String podName) throws IOException {
     return client.getPodLogs().get(podName) == null ?
-        client.getPodLog(client.getPodDetails().get(podName)) : client.getPodLogs().get(podName);
+        client.refreshPod(client.getPodDetails().get(podName)).getLogs()
+        : client.getPodLogs().get(podName);
   }
 
   @GetMapping("/pods/refresh")
@@ -49,9 +50,10 @@ public class PodController {
 
   @GetMapping("/pods/refresh/{podName}")
   @CrossOrigin("http://localhost:4200")
-  public String refreshPodLog(@PathVariable String podName) throws IOException {
+  public PodDetails refreshPodLog(@PathVariable String podName) throws IOException {
     log.info("POD: refreshing logs for " + podName);
-    return client.getPodLog(client.getPodDetails().get(podName));
+    client.refreshPod(client.getPodDetails().get(podName));
+    return client.getPodDetails().get(podName);
   }
 
 
