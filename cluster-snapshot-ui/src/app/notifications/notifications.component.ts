@@ -12,6 +12,7 @@ export class NotificationsComponent implements OnInit {
   @Input() ntfcn: NotificationModel;
   @Input() isNew: boolean;
   @Input() index: number;
+  public date = new Date();
 
   constructor(public snapshot: SnapshotService) {
   }

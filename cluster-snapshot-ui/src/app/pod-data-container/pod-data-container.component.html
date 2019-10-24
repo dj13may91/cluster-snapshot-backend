@@ -44,11 +44,12 @@
       </select>
     </div>
 
-    <div class="dropdown" style="margin-left: 25px;" (focus)="setNodeFilter($event)" (change)="setNodeFilter($event)">
+    <div class="dropdown" style="margin-left: 25px" (focus)="setNodeFilter($event)"
+         (change)="setNodeFilter($event)" *ngIf="nodeNameDetails && nodeNameDetails.length > 0">
       <select class="form-control-sm">
-        <option class="dropdown-item small" selected value="all">All {{nodeNameDetails.size}} Nodes</option>
-        <option class="dropdown-item small " *ngFor="let node of nodeNameDetails.keys()" value="{{node}}">
-          {{node + ' (' + nodeNameDetails.get(node) + ' pods)'}}
+        <option class="dropdown-item small" selected value="all">All Nodes</option>
+        <option class="dropdown-item small" *ngFor="let node of nodeNameDetails" value="{{node}}">
+          {{node + ' (' + generateNodeList(node) + ' pods)'}}
         </option>
       </select>
     </div>

@@ -26,13 +26,15 @@ export class SnapshotService {
   }
 
   public static getPodToString(pod: PodService) {
-    return 'ready=' + pod.ready + '\n' +
-      'status=' + pod.status + '\n' +
-      'restarts=' + pod.restarts + '\n' +
-      'age=' + pod.age + '\n' +
-      'ip=' + pod.ip + '\n' +
-      'node=' + pod.node + '\n' +
-      'podMemory=' + (pod.podMemory ? pod.podMemory : 'Not found');
+    return 'name= ' + pod.podName + '\n' +
+      'namespace= ' + pod.namespace + '\n' +
+      'ready= ' + pod.ready + '\n' +
+      'status= ' + pod.status + '\n' +
+      'restarts= ' + pod.restarts + '\n' +
+      'age= ' + pod.age + '\n' +
+      'ip= ' + pod.ip + '\n' +
+      'node= ' + pod.node + '\n' +
+      'podMemory= ' + (pod.podMemory ? pod.podMemory : 'Not found');
   }
 
   public static getServiceString(svc: ClusterServices) {

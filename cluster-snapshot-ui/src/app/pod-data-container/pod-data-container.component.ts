@@ -16,8 +16,8 @@ export class PodDataContainerComponent implements OnInit {
   public autoRefresh;
   public namespaceList;
   public podStatusList = ['Running', 'Not ready', 'Deleted'];
+  public nodeNameDetails: string[];
   public namespaceFilter = 'all';
-  public nodeNameDetails = new Map<string, number>();
   private podStatusFilter = 'all';
   private nodeFilter = 'all';
 
@@ -25,7 +25,7 @@ export class PodDataContainerComponent implements OnInit {
     if (this.snapshot.podList) {
       this.podList = this.snapshot.podList;
       console.log('found old podModal details. No. of pods running: ' + this.podList.length);
-      this.generateNodeList();
+      // this.generateNodeList();
     } else {
       console.log('calling backend to get pods data');
       this.podBackendClient.getPodMetadata().subscribe(
@@ -33,9 +33,9 @@ export class PodDataContainerComponent implements OnInit {
           this.podList = PodDataContainerComponent.sortArray(podServices);
           this.snapshot.podList = podServices;
           console.log('list', this.podList);
+          this.getNodeList();
           this.getAllPodLogs();
           this.updateLastRefreshTime();
-          this.generateNodeList();
         },
         (error) => {
           console.log('error getting podMetadata', error);
@@ -69,10 +69,9 @@ export class PodDataContainerComponent implements OnInit {
     this.getNamespaceList();
   }
 
-  enableAutoRefresh(duration = 600000) {
+  enableAutoRefresh(duration = 150000) {
     console.log('autoRefresh set to: ' + (duration / 1000) + 'seconds');
     this.autoRefresh = window.setInterval(() => {
-      console.log(duration, duration);
       this.refreshPodDetails();
     }, duration);
   }
@@ -112,6 +111,15 @@ export class PodDataContainerComponent implements OnInit {
       [this.podStatusList[2], deleted]];
   }
 
+  getNodeList() {
+    this.podBackendClient.getNodeMap().subscribe(
+      (res) => {
+        this.nodeNameDetails = [...res.keys()];
+      },
+      error => console.log(error)
+    );
+  }
+
   getNamespaceList() {
     this.podBackendClient.getNamespaceList().subscribe(
       (response) => {
@@ -148,6 +156,7 @@ export class PodDataContainerComponent implements OnInit {
         this.podList.push(...PodDataContainerComponent.sortArray(podServices));
         this.snapshot.podList.push(...podServices);
         console.log('list', this.podList);
+        this.getNodeList();
         this.getAllPodLogs();
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Refreshed podModal details'));
         console.log('Refreshed pods data');
@@ -165,7 +174,8 @@ export class PodDataContainerComponent implements OnInit {
     this.podList[index].logs = 'Refreshing pod details....';
     this.podBackendClient.refreshPodData(pod.podName).subscribe(
       (response: PodService) => {
-        this.podList[index] = response;
+        this.podList[index] = this.updatePodData(pod, response);
+        this.refreshPodStatusChart();
         console.log('pod data: ', this.podInfo(response));
         this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
           'logs for podModal ' + pod.podName + ''));
@@ -177,21 +187,23 @@ export class PodDataContainerComponent implements OnInit {
     );
   }
 
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   isReady(pod: PodService): boolean {
     return PodDataContainerComponent.isReady(pod);
   }
 
-  private generateNodeList() {
+  private generateNodeList(node) {
+
+    let count = 0;
     this.podList.forEach(pod => {
-      let count = this.nodeNameDetails.get(pod.node);
-      if (count) {
+      if (pod.node === node) {
         count++;
-        this.nodeNameDetails.set(pod.node, count);
-      } else {
-        this.nodeNameDetails.set(pod.node, 1);
       }
     });
-    this.nodeNameDetails = new Map([...this.nodeNameDetails.entries()].sort());
+    return count;
   }
 
   private updateLastRefreshTime() {
@@ -215,7 +227,7 @@ export class PodDataContainerComponent implements OnInit {
         duration = age.toFixed(0) + ' sec';
       }
       document.getElementById('refreshDuration').innerHTML = 'Last update: ' + duration + ' ago';
-    }, 10000);
+    }, 15000);
   }
 
   private setNamespaceFilter(event) {
@@ -230,10 +242,28 @@ export class PodDataContainerComponent implements OnInit {
 
   private setNodeFilter(event) {
     this.nodeFilter = event.target.value;
-    console.log(this.nodeFilter);
   }
 
   private podInfo(pod: PodService) {
     return SnapshotService.getPodToString(pod);
+  }
+
+  private updatePodData(podOld: PodService, podNew: PodService) {
+    podOld.namespace = podNew.namespace;
+    podOld.podName = podNew.podName;
+    podOld.ready = podNew.ready;
+    podOld.status = podNew.status;
+    podOld.restarts = podNew.restarts;
+    podOld.age = podNew.age;
+    podOld.ip = podNew.ip;
+    podOld.node = podNew.node;
+    podOld.podMemory = podNew.podMemory;
+    podOld.colour = podNew.colour;
+    podOld.logs = podNew.logs;
+    podOld.icon = podNew.icon;
+    podOld.podCommand = podNew.podCommand;
+    podOld.deleted = podNew.deleted;
+    podOld.podId = podNew.podId;
+    return podOld;
   }
 }

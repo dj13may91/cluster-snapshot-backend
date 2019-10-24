@@ -119,6 +119,9 @@ export class ServerComponentComponent implements OnInit, OnDestroy {
       });
   }
 
+  clearLogs() {
+    this.logs = [];
+  }
 
   pauseConnection() {
     this.disabled = false;

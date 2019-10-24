@@ -115,8 +115,7 @@ public class ClusterController {
 
   @PostMapping(value = "/context/{currentContext}", produces = "application/json")
   @CrossOrigin("http://localhost:4200")
-  public void setCurrentContext(@PathVariable String currentContext)
-      throws IOException, ApiException {
+  public void setCurrentContext(@PathVariable String currentContext) {
     ClusterCommands.CURRENT_CONTEXT = currentContext;
     log.info("setting context to " + currentContext);
     this.clusterCommandLogMap.clear();
@@ -126,7 +125,7 @@ public class ClusterController {
       try {
         client.refreshPodDetails(true);
       } catch (ApiException e) {
-        e.printStackTrace();
+        log.error("Error in pod modal refresh", e);
       }
     }).start();
 
@@ -136,7 +135,7 @@ public class ClusterController {
           try {
             refreshCommandLog(ClusterCommands.clusterCommandsMap.get(command));
           } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Error in service modal refresh", e);
           }
         });
   }

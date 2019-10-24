@@ -20,7 +20,9 @@
 
 <div class="pad-bottom">
   <input  style="float: left" type="text" placeholder="search in logs" [(ngModel)]="searchText">
-  <i style="float: right; margin-right: 3%; color: midnightblue" class="fa fa-arrow-down" aria-hidden="true"></i>
+  <button class="btn btn-sm bg-warning" style="float: right" (click)="clearLogs()" [ngbTooltip]="'Clear logs'">
+  <i style="float: right; margin-right: 3%; color: midnightblue" class="fa fa-trash" aria-hidden="true"></i>
+  </button>
 </div>
 
 <div class="container badge-dark" id="logModal" style="overflow-y: auto; max-height: 450px">

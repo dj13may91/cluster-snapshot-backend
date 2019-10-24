@@ -121,8 +121,7 @@ public class KubernetesClient {
       this.podDetails.clear();
       this.podLogs.clear();
     }
-    List<V1Pod> v1Pods = api
-        .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
+    List<V1Pod> v1Pods = api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
     createPodObjects(v1Pods, hardRefresh);
   }
 
@@ -148,6 +147,14 @@ public class KubernetesClient {
 
   public PodDetails refreshPod(PodDetails pod) {
     try {
+      List<V1Pod> v1Pods = api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
+      PodDetails finalPod = pod;
+      if(v1Pods.parallelStream().filter(v1Pod -> v1Pod.getMetadata().getName().equals(finalPod.getPodName())).count() <= 0 ){
+        pod.setDeleted(true);
+        log.warn("Pod " + pod.getPodName() + " is deleted!");
+        return pod;
+      }
+
       pod = new PodDetails(
           api.readNamespacedPod(pod.getPodName(), pod.getNamespace(), null, null, null));
       podDetails.put(pod.getPodName(), pod);
@@ -155,29 +162,12 @@ public class KubernetesClient {
           null, null, null, null, 1000, true));
 
     } catch (Exception e) {
-      log.error(
-          "Error getting logs for podModal:" + pod.getPodName() + ",reason: " + e
-              .getLocalizedMessage());
+      log.error("POD: Error getting logs:" + pod.getPodName() + ",reason: " + e.getLocalizedMessage());
       pod.setLogs("Error getting logs, error: " + e.getLocalizedMessage());
     }
-    podLogs.put(pod.getPodName(),
-        StringUtils.isBlank(pod.getLogs()) ? "Unable to get logs" : pod.getLogs());
+    podLogs.put(pod.getPodName(), StringUtils.isBlank(pod.getLogs()) ? "Unable to get logs" : pod.getLogs());
     podDetails.get(pod.getPodName()).setLogs(podLogs.get(pod.getPodName()));
     return pod;
   }
 
-  public ConcurrentHashMap<String, String> getClusterDetails() {
-    ConcurrentHashMap<String, String> clusterDetailsMap = new ConcurrentHashMap<>();
-    ClusterCommands.clusterCommandsMap.values().stream().parallel().forEach(command -> {
-      try {
-        clusterDetailsMap.put(command, String.valueOf(instance.getCommandOutput(command)));
-        log.info("Finished running: " + command);
-      } catch (IOException e) {
-        log.error("Failed to execute : " + command);
-        clusterDetailsMap
-            .put(command, "Failed to execute : " + command + " \nReason: " + e.getMessage());
-      }
-    });
-    return clusterDetailsMap;
-  }
 }
