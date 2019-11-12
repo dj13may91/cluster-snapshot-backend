@@ -69,7 +69,7 @@ export class PodDataContainerComponent implements OnInit {
     this.getNamespaceList();
   }
 
-  enableAutoRefresh(duration = 150000) {
+  enableAutoRefresh(duration = 600000) {
     console.log('autoRefresh set to: ' + (duration / 1000) + 'seconds');
     this.autoRefresh = window.setInterval(() => {
       this.refreshPodDetails();
@@ -186,6 +186,21 @@ export class PodDataContainerComponent implements OnInit {
       }
     );
   }
+
+  deletePod(pod: PodService) {
+    this.podBackendClient.deletePodByName(pod.podName).subscribe(
+      (response: string) => {
+        console.log('deleted pod, ', response);
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.INFO, response));
+        this.refreshPodLogs(pod);
+      },
+      (error) => {
+        console.log('error deleting pod ', error);
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error deleting pod ' + pod.podName));
+      }
+    );
+  }
+
 
   delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));

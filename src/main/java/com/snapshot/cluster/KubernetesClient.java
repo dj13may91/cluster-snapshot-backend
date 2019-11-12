@@ -3,13 +3,13 @@ package com.snapshot.cluster;
 import static com.snapshot.cluster.constants.ClusterCommands.CURRENT_CONTEXT;
 import static com.snapshot.cluster.constants.ClusterCommands.KUBE_CONFIG_FILE;
 
-import com.snapshot.cluster.constants.ClusterCommands;
 import com.snapshot.cluster.models.PodDetails;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.models.V1Pod;
+import io.kubernetes.client.models.V1Status;
 import io.kubernetes.client.util.Config;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,36 +46,6 @@ public class KubernetesClient {
     options.setPrettyFlow(true);
   }
 
-  public static void deletePod(String podName) throws ApiException, IOException {
-    ExtensionsV1beta1Api api = new ExtensionsV1beta1Api(defaultClient);
-    KubernetesClient kc = new KubernetesClient();
-    try {
-      kc.getApi()
-          .deleteNamespacedPod("soar-rule-service-785d4b45d7-vjwtm", "soar", null, null, null, null,
-              null, null);
-    } catch (ApiException aX) {
-      System.out.println(aX);
-      System.out.println("Pod not found");
-    } catch (Exception e) {
-      try {
-        System.out.println(e);
-        Thread.sleep(5000);
-        System.out.println(
-            kc.api.readNamespacedPodStatus("soar-rule-service-785d4b45d7-vjwtm", "soar", null));
-        Thread.sleep(3000);
-        kc.api.readNamespacedPod("soar-rule-service-785d4b45d7-vjwtm", "soar", null, null, null);
-      } catch (ApiException apiEx) {
-        if (apiEx.getMessage().equals("Not Found")) {
-          System.out.println("Pod deleted");
-        } else {
-          System.out.println("apiEx: " + apiEx);
-        }
-      } catch (InterruptedException ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
-
   public void setDefaultClient() {
     try {
       defaultClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
@@ -83,6 +53,35 @@ public class KubernetesClient {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public String deletePodByName(String podName) {
+    PodDetails pod = podDetails.get(podName);
+    try {
+      V1Status status = getApi().deleteNamespacedPod(pod.getPodName(), pod.getNamespace(),
+          null, null, null, null, null, null);
+    } catch (ApiException aX) {
+      System.out.println("Pod not found");
+      return "Pod not found";
+    } catch (Exception e) {
+      try {
+        log.error(e.getMessage());
+        Thread.sleep(6000);
+        api.readNamespacedPod(pod.getPodName(), pod.getNamespace(), null, null, null);
+      } catch (ApiException apiEx) {
+        if (apiEx.getMessage().equals("Not Found")) {
+          System.out.println("Pod " + pod.getPodName() + " deleted");
+          return "Pod " + pod.getPodName() + " deleted";
+        } else {
+          log.error("apiEx: " + apiEx);
+          return "Error deleting pod  " + pod.getPodName();
+        }
+      } catch (InterruptedException ex) {
+        log.error(ex.getMessage());
+        return ex.getMessage();
+      }
+    }
+    return "Pod " + pod.getPodName() + " deleted";
   }
 
   @PostConstruct
@@ -121,7 +120,8 @@ public class KubernetesClient {
       this.podDetails.clear();
       this.podLogs.clear();
     }
-    List<V1Pod> v1Pods = api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
+    List<V1Pod> v1Pods = api
+        .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
     createPodObjects(v1Pods, hardRefresh);
   }
 
@@ -147,9 +147,12 @@ public class KubernetesClient {
 
   public PodDetails refreshPod(PodDetails pod) {
     try {
-      List<V1Pod> v1Pods = api.listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
+      List<V1Pod> v1Pods = api
+          .listPodForAllNamespaces(null, null, null, null, null, null, null, null, null).getItems();
       PodDetails finalPod = pod;
-      if(v1Pods.parallelStream().filter(v1Pod -> v1Pod.getMetadata().getName().equals(finalPod.getPodName())).count() <= 0 ){
+      if (v1Pods.parallelStream()
+          .filter(v1Pod -> v1Pod.getMetadata().getName().equals(finalPod.getPodName())).count()
+          <= 0) {
         pod.setDeleted(true);
         log.warn("Pod " + pod.getPodName() + " is deleted!");
         return pod;
@@ -162,10 +165,12 @@ public class KubernetesClient {
           null, null, null, null, 1000, true));
 
     } catch (Exception e) {
-      log.error("POD: Error getting logs:" + pod.getPodName() + ",reason: " + e.getLocalizedMessage());
+      log.error(
+          "POD: Error getting logs:" + pod.getPodName() + ",reason: " + e.getLocalizedMessage());
       pod.setLogs("Error getting logs, error: " + e.getLocalizedMessage());
     }
-    podLogs.put(pod.getPodName(), StringUtils.isBlank(pod.getLogs()) ? "Unable to get logs" : pod.getLogs());
+    podLogs.put(pod.getPodName(),
+        StringUtils.isBlank(pod.getLogs()) ? "Unable to get logs" : pod.getLogs());
     podDetails.get(pod.getPodName()).setLogs(podLogs.get(pod.getPodName()));
     return pod;
   }

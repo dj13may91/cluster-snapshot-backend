@@ -56,4 +56,10 @@ export class PodBackendClientComponent {
       responseType: 'json'
     });
   }
+
+  deletePodByName(podName: string) {
+    return this.http.delete(this.pods + podName, {
+      responseType: 'text'
+    });
+  }
 }

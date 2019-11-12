@@ -78,6 +78,31 @@
         <div style="display: flow; float: right;">
           <span class="badge badge-dark">{{pod.namespace}}</span>
           <span class="badge badge-light"><i class="fa fa-clock-o"></i>{{pod.age}}</span>
+          <!--delete modal-->
+          <button class="btn btn-sm btn-outline-warning" data-toggle="modal" *ngIf="!pod.deleted"
+                  [attr.data-target]="'#' + pod.podName.split('.')[0] + 'deleteModal'">
+            <i style="color: tomato" class="fa fa-trash fa-fw" data-toggle="tooltip"
+               title="Delete pod"></i>
+          </button>
+
+          <!-- Modal -->
+          <div class="modal fade" id="{{pod.podName.split('.')[0] + 'deleteModal' }}" role="dialog"
+               aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-body">
+                  <small>Are you sure you want to delete pod {{pod.podName}} ?</small>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                  <button type="button" class="btn btn-danger" data-dismiss="modal"
+                          (click)="deletePod(pod)">Yes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <span>
             <i class="fa fa-info m-3 text-info" data-toggle="tooltip" data-placement="left"
                title="{{podInfo(pod)}}"></i></span>
