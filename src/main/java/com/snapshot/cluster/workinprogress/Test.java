@@ -5,8 +5,10 @@ import io.kubernetes.client.ApiException;
 import io.kubernetes.client.Configuration;
 import io.kubernetes.client.PodLogs;
 import io.kubernetes.client.PortForward;
+import io.kubernetes.client.apis.AppsV1Api;
 import io.kubernetes.client.apis.CoreV1Api;
 import io.kubernetes.client.models.V1Container;
+import io.kubernetes.client.models.V1EnvVar;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.util.Config;
 import java.io.IOException;
@@ -17,6 +19,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -29,12 +32,14 @@ public class Test {
 
   public static void main(String[] args) throws IOException, ApiException {
     ApiClient defaultClient = Config.defaultClient();
-
-    CoreV1Api api = new CoreV1Api(defaultClient);
-
-//    System.out.println(api.readNamespacedPod("soar-rule-service-579d64b5c9-qgp26", "soar", null, null, null));
-    System.out.println(api.listServiceForAllNamespaces(null, null, null, null,
-        null, null, null, null, null).getItems().get(0));
+    AppsV1Api appsV1Api = new AppsV1Api();
+    appsV1Api.setApiClient(defaultClient);
+    System.out.println(appsV1Api
+        .listNamespacedDeployment("seca", null, null, null,
+            null, null, null, null, null, null)
+        .getItems().stream()
+        .filter(item -> item.getMetadata().getName().contains("seca-rule-service")).collect(
+            Collectors.toList()));
   }
 
   public static long copy(InputStream from, OutputStream to) throws IOException {

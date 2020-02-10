@@ -32,7 +32,11 @@ Dockerfile
 .dockerignore
 docker-compose*
 run.sh
-src/main/java/com/snapshot/cluster/Test.java
 
 runner.sh
 src/main/java/kubeconfigs/
+
+kubectl.exe
+src/main/java/com/snapshot/cluster/models/DeploymentResourceDetails.java
+src/main/java/com/snapshot/cluster/models/DeploymentStatus.java
+src/main/java/com/snapshot/cluster/test

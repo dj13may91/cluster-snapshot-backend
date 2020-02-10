@@ -1,6 +1,6 @@
 <code>
   <div *ngIf="isNew">
-    <div contenteditable="true" *ngIf="ntfcn.type == 1" style="margin: 0"
+    <div contenteditable="false" *ngIf="ntfcn.type == 1" style="margin: 0"
          class="alert alert-success alert-dismissible" role="alert">{{ntfcn.message}}
       <span class="badge badge-success" style="float: right">{{ ntfcn.getTime() }}</span>
       <button type="button" class="close" (click)="onCloseNew()">

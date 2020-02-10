@@ -30,7 +30,7 @@ export class ClusterCommandsComponent implements OnInit {
           this.getClusterCommandLogs();
         },
         (error) => console.error(error)
-      )
+      );
     }
   }
 

@@ -21,7 +21,7 @@ export class BackendClientComponent implements OnInit {
   public refreshCommandOutput = this.clusterCommands + 'refresh/';
 
   constructor(public http: HttpClient) {
-    console.log(this.http.get('http://localhost:8080/health'));
+    console.log('Health', this.http.get('http://localhost:8080/health'));
   }
 
   ngOnInit() {

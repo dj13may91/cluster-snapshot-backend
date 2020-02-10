@@ -8,9 +8,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
 
 @Data
+@Slf4j
 public class PodDetails {
 
   private String namespace;
@@ -33,16 +35,20 @@ public class PodDetails {
   public PodDetails(V1Pod v1Pod) {
     setPodName(v1Pod.getMetadata().getName());
     setNamespace(v1Pod.getMetadata().getNamespace());
-    V1ContainerStatus conStatus = v1Pod.getStatus().getContainerStatuses().get(0);
     final int[] readyCount = {0};
-    v1Pod.getStatus().getContainerStatuses()
-        .forEach(containerStatus -> readyCount[0] += containerStatus.isReady() ? 1 : 0);
-
-    setReady(readyCount[0] + "/" + v1Pod.getStatus().getContainerStatuses().size());
+    try {
+      v1Pod.getStatus().getContainerStatuses()
+          .forEach(containerStatus -> readyCount[0] += containerStatus.isReady() ? 1 : 0);
+      setReady(readyCount[0] + "/" + v1Pod.getStatus().getContainerStatuses().size());
+    } catch (NullPointerException e) {
+      setReady("NaN");
+//      e.printStackTrace();
+    }
 
     setAge(getAge(v1Pod.getStatus().getStartTime()));
-
+    V1ContainerStatus conStatus;
     try {
+      conStatus = v1Pod.getStatus().getContainerStatuses().get(0);
       if (conStatus.getState().getTerminated() != null) {
         setStatus(conStatus.getState().getTerminated().getReason());
       } else if (conStatus.getState().getRunning() != null) {
@@ -52,30 +58,33 @@ public class PodDetails {
       } else {
         setStatus("Error generating status!");
       }
-    }catch(Exception e){
+      setRestarts(conStatus.getRestartCount());
+    } catch (Exception e) {
       setStatus("Error generating status!");
-      System.out.println(e.getMessage());
-      System.out.println(conStatus);
-      e.printStackTrace();
+      log.error(e.getMessage());
+//      e.printStackTrace();
     }
     setIP(v1Pod.getStatus().getPodIP());
-    setRestarts(conStatus.getRestartCount());
     setNode(v1Pod.getSpec().getNodeName());
   }
 
   public static String getAge(DateTime creationTime) {
-    long podAge = (new Date().getTime() - creationTime.toDate().getTime()) / 1000;
-    if (podAge >= (60 * 60 * 24)) {
-      podAge = podAge / (60 * 60 * 24);
-      return podAge + "d";
-    } else if (podAge >= (60 * 60)) {
-      podAge = podAge / 3600;
-      return podAge + "h";
-    } else if (podAge >= 60) {
-      podAge = podAge / 60;
-      return (podAge + "m");
-    } else {
-      return (podAge + "s");
+    try{
+      long podAge = (new Date().getTime() - creationTime.toDate().getTime()) / 1000;
+      if (podAge >= (60 * 60 * 24)) {
+        podAge = podAge / (60 * 60 * 24);
+        return podAge + "d";
+      } else if (podAge >= (60 * 60)) {
+        podAge = podAge / 3600;
+        return podAge + "h";
+      } else if (podAge >= 60) {
+        podAge = podAge / 60;
+        return (podAge + "m");
+      } else {
+        return (podAge + "s");
+      }
+    }catch (NullPointerException e){
+      return "NaN";
     }
   }
 
