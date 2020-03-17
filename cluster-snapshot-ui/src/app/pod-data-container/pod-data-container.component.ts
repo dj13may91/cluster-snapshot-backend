@@ -31,6 +31,7 @@ export class PodDataContainerComponent implements OnInit {
       this.podBackendClient.getPodMetadata().subscribe(
         (podServices: PodService[]) => {
           this.setUp(podServices);
+          this.enableAutoRefresh();
         },
         (error) => {
           console.log('error getting podMetadata', error);
@@ -76,7 +77,6 @@ export class PodDataContainerComponent implements OnInit {
     console.log('list', this.podList);
     this.getNodeList();
     this.getAllPodLogs();
-    this.enableAutoRefresh();
     this.updateLastRefreshTime();
   }
 
