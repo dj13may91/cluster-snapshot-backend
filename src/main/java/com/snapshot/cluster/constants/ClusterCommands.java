@@ -3,12 +3,18 @@ package com.snapshot.cluster.constants;
 import com.snapshot.cluster.models.ConfigMaps;
 import com.snapshot.cluster.models.PodDetails;
 import com.snapshot.cluster.models.Services;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import lombok.Setter;
 
 @Setter
 public class ClusterCommands {
+
+  public static final List<String> WATCHABLE_NAMESPACES =  new ArrayList<String>() {{
+    add("seca");
+  }};
 
   public static final String CLUSTER_NAME = "kubectl config current-context";
   public static final String HELM_CHARTS_ALL_NAMESPACES = "helm ls --all";
@@ -33,7 +39,7 @@ public class ClusterCommands {
     clusterCommandsMap.put("clusterName", CLUSTER_NAME);
 //    clusterCommandsMap.put("helmChartsAllNamespaces", "helm ls --all");
     clusterCommandsMap.put("getAllPods", GET_ALL_PODS);
-    clusterCommandsMap.put("getAllPodsPlatform", "kubectl get pods -n soar");
+    WATCHABLE_NAMESPACES.forEach(namespace -> clusterCommandsMap.put("getAll" + namespace + "Pods", "kubectl get pods -n " + namespace));
     clusterCommandsMap.put("getAllPVC", "kubectl get persistentvolumes");
     clusterCommandsMap.put("getAllNodes", "kubectl get nodes");
     clusterCommandsMap.put("getClusterInfo", "kubectl cluster-info");

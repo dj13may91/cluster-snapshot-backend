@@ -25,17 +25,12 @@ export class PodDataContainerComponent implements OnInit {
     if (this.snapshot.podList) {
       this.podList = this.snapshot.podList;
       console.log('found old podModal details. No. of pods running: ' + this.podList.length);
-      // this.generateNodeList();
+      this.getNodeList();
     } else {
       console.log('calling backend to get pods data');
       this.podBackendClient.getPodMetadata().subscribe(
         (podServices: PodService[]) => {
-          this.podList = PodDataContainerComponent.sortArray(podServices);
-          this.snapshot.podList = podServices;
-          console.log('list', this.podList);
-          this.getNodeList();
-          this.getAllPodLogs();
-          this.updateLastRefreshTime();
+          this.setUp(podServices);
         },
         (error) => {
           console.log('error getting podMetadata', error);
@@ -51,7 +46,6 @@ export class PodDataContainerComponent implements OnInit {
         }
       );
     }
-    this.enableAutoRefresh();
   }
 
   static isReady(pod: PodService): boolean {
@@ -74,6 +68,52 @@ export class PodDataContainerComponent implements OnInit {
     this.autoRefresh = window.setInterval(() => {
       this.refreshPodDetails();
     }, duration);
+  }
+
+  private setUp(podServices: PodService[]) {
+    this.podList = PodDataContainerComponent.sortArray(podServices);
+    this.snapshot.podList = podServices;
+    console.log('list', this.podList);
+    this.getNodeList();
+    this.getAllPodLogs();
+    this.enableAutoRefresh();
+    this.updateLastRefreshTime();
+  }
+
+  refreshPodDetails() {
+    this.podBackendClient.refreshPodDetails().subscribe(
+      (podServices: PodService[]) => {
+        this.podList = [];
+        this.snapshot.podList = [];
+        this.setUp(podServices);
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Refreshed podModal details'));
+        console.log('Refreshed pods data');
+      },
+      (error) => {
+        console.log('error refreshing podModal logs ', error);
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error refreshing podModal details'));
+      }
+    );
+  }
+
+  refreshPodLogs(pod: PodService) {
+    const index = this.podList.indexOf(pod);
+    this.podList[index].logs = 'Refreshing pod details....';
+    this.podList[index].hasLogs = false;
+    this.podBackendClient.refreshPodData(pod.podName).subscribe(
+      (response: PodService) => {
+        this.podList[index] = this.updatePodData(pod, response);
+        this.refreshPodStatusChart();
+        this.podList[index].hasLogs = true;
+        console.log('pod data: ', this.podInfo(response));
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
+          'logs for podModal ' + pod.podName + ''));
+      },
+      (error) => {
+        console.log('error refreshing podModal logs ', error);
+        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error fetching logs for podModal ' + pod.podName));
+      }
+    );
   }
 
   toggleAutoRefresh() {
@@ -135,6 +175,8 @@ export class PodDataContainerComponent implements OnInit {
     for (const pod of this.podList) {
       if (!pod.logs) {
         this.getPodLogs(pod);
+      } else {
+        pod.hasLogs = true;
       }
     }
   }
@@ -142,48 +184,13 @@ export class PodDataContainerComponent implements OnInit {
   getPodLogs(pod: PodService) {
     const index = this.podList.indexOf(pod);
     this.podList[index].logs = 'Fetching new logs....';
+    this.podList[index].hasLogs = false;
     this.podBackendClient.getPodLogs(pod.podName).subscribe(
-      (response: string) => this.podList[index].logs = response,
+      (response: string) => {
+        this.podList[index].logs = response;
+        this.podList[index].hasLogs = true;
+      },
       (error) => console.log('error getting logs: ', error)
-    );
-  }
-
-  refreshPodDetails() {
-    this.podBackendClient.refreshPodDetails().subscribe(
-      (podServices: PodService[]) => {
-        this.podList = [];
-        this.snapshot.podList = [];
-        this.podList.push(...PodDataContainerComponent.sortArray(podServices));
-        this.snapshot.podList.push(...podServices);
-        console.log('list', this.podList);
-        this.getNodeList();
-        this.getAllPodLogs();
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS, 'Refreshed podModal details'));
-        console.log('Refreshed pods data');
-        this.updateLastRefreshTime();
-      },
-      (error) => {
-        console.log('error refreshing podModal logs ', error);
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error refreshing podModal details'));
-      }
-    );
-  }
-
-  refreshPodLogs(pod: PodService) {
-    const index = this.podList.indexOf(pod);
-    this.podList[index].logs = 'Refreshing pod details....';
-    this.podBackendClient.refreshPodData(pod.podName).subscribe(
-      (response: PodService) => {
-        this.podList[index] = this.updatePodData(pod, response);
-        this.refreshPodStatusChart();
-        console.log('pod data: ', this.podInfo(response));
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.SUCCESS,
-          'logs for podModal ' + pod.podName + ''));
-      },
-      (error) => {
-        console.log('error refreshing podModal logs ', error);
-        this.snapshot.addNewNotification(new NotificationModel(NotificationModel.ERROR, 'Error fetching logs for podModal ' + pod.podName));
-      }
     );
   }
 
@@ -211,7 +218,6 @@ export class PodDataContainerComponent implements OnInit {
   }
 
   private generateNodeList(node) {
-
     let count = 0;
     this.podList.forEach(pod => {
       if (pod.node === node) {
@@ -247,12 +253,10 @@ export class PodDataContainerComponent implements OnInit {
 
   private setNamespaceFilter(event) {
     this.namespaceFilter = event.target.value;
-    console.log(this.namespaceFilter);
   }
 
   private setPodStatusFilter(event) {
     this.podStatusFilter = event.target.value;
-    console.log(this.podStatusFilter);
   }
 
   private setNodeFilter(event) {

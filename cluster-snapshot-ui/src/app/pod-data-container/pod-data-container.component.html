@@ -76,7 +76,8 @@
           </h2>
         </div>
         <div style="display: flow; float: right;">
-          <span class="badge badge-dark">{{pod.namespace}}</span>
+          <span class="badge badge-dark" *ngIf="!pod.hasLogs">{{pod.namespace}}</span>
+          <span class="badge badge-light" *ngIf="pod.hasLogs">{{pod.namespace}}</span>
           <span class="badge badge-light"><i class="fa fa-clock-o"></i>{{pod.age}}</span>
           <!--delete modal-->
           <button class="btn btn-sm btn-outline-warning" data-toggle="modal" *ngIf="!pod.deleted"

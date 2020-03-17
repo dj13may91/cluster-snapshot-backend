@@ -15,6 +15,7 @@ export class PodService {
   public podCommand: string;
   public deleted: boolean;
   public podId;
+  public hasLogs = false;
 
   constructor() {
   }
