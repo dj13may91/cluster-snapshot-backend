@@ -9,3 +9,14 @@
 .pod-not-ready {
   color: #bd6506;
 }
+
+.medium-text {
+  font-size: 90%;
+  font-weight: 400;
+}
+
+.stick-panel {
+  z-index: 12;
+  top: 59px;
+  position: sticky;
+}

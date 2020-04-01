@@ -217,10 +217,20 @@ export class PodDataContainerComponent implements OnInit {
     return PodDataContainerComponent.isReady(pod);
   }
 
-  private generateNodeList(node) {
+  private generatePodOnNodeCount(node) {
     let count = 0;
     this.podList.forEach(pod => {
       if (pod.node === node) {
+        count++;
+      }
+    });
+    return count;
+  }
+
+  private generatePodOnNamespaceCount(namespace) {
+    let count = 0;
+    this.podList.forEach(pod => {
+      if (pod.namespace === namespace) {
         count++;
       }
     });

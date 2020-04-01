@@ -1,9 +1,7 @@
 package com.snapshot.cluster.controller;
 
-import static com.snapshot.cluster.constants.ClusterCommands.CURRENT_CONTEXT;
-import static com.snapshot.cluster.constants.ClusterCommands.KUBE_CONFIG_FILE;
-
 import com.snapshot.cluster.KubernetesClient;
+import com.snapshot.cluster.constants.ClusterCommands;
 import com.snapshot.cluster.models.PodDetails;
 import com.snapshot.cluster.models.SocketLogsModal;
 import io.kubernetes.client.ApiClient;
@@ -65,7 +63,8 @@ public class LiveLogsController {
     boolean isARerun = setUpSession(sessionId, podName);
     new Thread(() -> {
       try {
-        ApiClient apiClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
+        ClusterCommands cc = new ClusterCommands();
+        ApiClient apiClient = Config.fromConfig(cc.KUBE_CONFIG_FOLDER + cc.CURRENT_CONTEXT);
         Configuration.setDefaultApiClient(apiClient);
         apiClient.getHttpClient().setReadTimeout(0, TimeUnit.SECONDS); // infinite timeout
         PodLogs logs = new PodLogs();

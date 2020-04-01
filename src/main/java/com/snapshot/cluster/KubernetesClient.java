@@ -1,13 +1,10 @@
 package com.snapshot.cluster;
 
-import static com.snapshot.cluster.constants.ClusterCommands.CURRENT_CONTEXT;
-import static com.snapshot.cluster.constants.ClusterCommands.KUBE_CONFIG_FILE;
-
+import com.snapshot.cluster.constants.ClusterCommands;
 import com.snapshot.cluster.models.PodDetails;
 import io.kubernetes.client.ApiClient;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.apis.CoreV1Api;
-import io.kubernetes.client.apis.ExtensionsV1beta1Api;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.models.V1Status;
 import io.kubernetes.client.util.Config;
@@ -22,6 +19,7 @@ import javax.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.DumperOptions;
 
@@ -31,15 +29,18 @@ import org.yaml.snakeyaml.DumperOptions;
 public class KubernetesClient {
 
   public static ApiClient defaultClient;
-
+  private ClusterCommands clusterCommands;
   private Map<String, PodDetails> podDetails = new ConcurrentHashMap<>();
   private Map<String, String> podLogs = new ConcurrentHashMap<>();
   private TerminalInstance instance = new TerminalInstance();
   private DumperOptions options;
   private CoreV1Api api;
 
-  public KubernetesClient() throws IOException {
-    defaultClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
+  @Autowired
+  public KubernetesClient(ClusterCommands clusterCommands) throws IOException {
+    this.clusterCommands = clusterCommands;
+    defaultClient = Config
+        .fromConfig(clusterCommands.KUBE_CONFIG_FOLDER + clusterCommands.CURRENT_CONTEXT);
     api = new CoreV1Api(defaultClient);
     options = new DumperOptions();
     options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
@@ -48,7 +49,8 @@ public class KubernetesClient {
 
   public void setDefaultClient() {
     try {
-      defaultClient = Config.fromConfig(KUBE_CONFIG_FILE + CURRENT_CONTEXT);
+      defaultClient = Config
+          .fromConfig(clusterCommands.KUBE_CONFIG_FOLDER + clusterCommands.CURRENT_CONTEXT);
       api = new CoreV1Api(defaultClient);
     } catch (IOException e) {
       e.printStackTrace();
@@ -61,7 +63,7 @@ public class KubernetesClient {
       V1Status status = getApi().deleteNamespacedPod(pod.getPodName(), pod.getNamespace(),
           null, null, null, null, null, null);
     } catch (ApiException aX) {
-      System.out.println("Pod not found");
+      log.error("Pod not found. " + aX.getResponseBody());
       return "Pod not found";
     } catch (Exception e) {
       try {

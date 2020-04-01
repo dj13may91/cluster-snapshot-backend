@@ -8,11 +8,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
 @Setter
+@Configuration
 public class ClusterCommands {
 
-  public static final List<String> WATCHABLE_NAMESPACES =  new ArrayList<String>() {{
+  public static final List<String> WATCHABLE_NAMESPACES = new ArrayList<String>() {{
     add("seca");
   }};
 
@@ -30,16 +33,14 @@ public class ClusterCommands {
   public static final String GET_PERSISTENT_VOLUMES = "kubectl get pvc --all-namespaces";
   public static final String GET_DEPLOYMENTS = "kubectl get deployments --all-namespaces";
   public static final String SERVICE_CMD = "kubectl describe svc %s -n %s";
-  public static String CURRENT_CONTEXT = "p22-k8s-key";
-  public static String KUBE_CONFIG_FILE = "C:\\Users\\djain\\IdeaProjects\\cluster-snapshot-backend\\src\\main\\java\\kubeconfigs\\";
-  public static String CONFIG_SETTING = " --kubeconfig " + KUBE_CONFIG_FILE;
   public static Map<String, String> clusterCommandsMap = new TreeMap<>();
 
   static {
     clusterCommandsMap.put("clusterName", CLUSTER_NAME);
 //    clusterCommandsMap.put("helmChartsAllNamespaces", "helm ls --all");
     clusterCommandsMap.put("getAllPods", GET_ALL_PODS);
-    WATCHABLE_NAMESPACES.forEach(namespace -> clusterCommandsMap.put("getAll" + namespace + "Pods", "kubectl get pods -n " + namespace));
+    WATCHABLE_NAMESPACES.forEach(namespace -> clusterCommandsMap
+        .put("getAll" + namespace + "Pods", "kubectl get pods -n " + namespace));
     clusterCommandsMap.put("getAllPVC", "kubectl get persistentvolumes");
     clusterCommandsMap.put("getAllNodes", "kubectl get nodes");
     clusterCommandsMap.put("getClusterInfo", "kubectl cluster-info");
@@ -54,6 +55,15 @@ public class ClusterCommands {
     clusterCommandsMap.put("getAllReplicaSets", "kubectl get replicasets --all-namespaces");
     clusterCommandsMap.put("getCurrentEvents", "kubectl get events --all-namespaces");
     clusterCommandsMap.put("getAllDeployments", GET_DEPLOYMENTS);
+  }
+
+  @Value("${default-context}")
+  public String CURRENT_CONTEXT;
+  @Value("${config-folder}")
+  public String KUBE_CONFIG_FOLDER;
+
+  public String getConfigSetting() {
+    return " --kubeconfig " + getConfigFilePath();
   }
 
   public static String getCommandToDescribeConfigMap(ConfigMaps configMap) {
@@ -74,5 +84,9 @@ public class ClusterCommands {
 
   public static String getCommandToDescribeSecret(String secretname, String namespace) {
     return "kubectl describe secret " + secretname + " -n " + namespace;
+  }
+
+  public String getConfigFilePath() {
+    return KUBE_CONFIG_FOLDER + CURRENT_CONTEXT;
   }
 }

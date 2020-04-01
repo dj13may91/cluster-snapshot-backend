@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -33,19 +32,22 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin("http://localhost:4200")
 public class ClusterController {
 
-  @Autowired
-  WebController webController;
-
-  @Autowired
-  KubernetesClient client;
-
-  @Autowired
-  TerminalInstance instance;
-
-  @Autowired
-  ServiceHelper serviceHelper;
+  final WebController webController;
+  final KubernetesClient client;
+  final TerminalInstance instance;
+  final ServiceHelper serviceHelper;
+  final ClusterCommands clusterCommands;
 
   private Map<String, String> clusterCommandLogMap = new HashMap<>();
+
+  public ClusterController(WebController webController, KubernetesClient client,
+      TerminalInstance instance, ServiceHelper serviceHelper, ClusterCommands clusterCommands) {
+    this.webController = webController;
+    this.client = client;
+    this.instance = instance;
+    this.serviceHelper = serviceHelper;
+    this.clusterCommands = clusterCommands;
+  }
 
   @GetMapping("/health")
   @CrossOrigin("http://localhost:4200")
@@ -101,7 +103,7 @@ public class ClusterController {
   @GetMapping(value = "/context/list", produces = "application/json")
   @CrossOrigin("http://localhost:4200")
   public ResponseEntity<Set<String>> getContextList() {
-    File folder = new File(ClusterCommands.KUBE_CONFIG_FILE);
+    File folder = new File(clusterCommands.KUBE_CONFIG_FOLDER);
     Set<String> kubeConfigSet = new HashSet<>(Arrays.asList(Objects.requireNonNull(folder.list())));
     return new ResponseEntity<>(kubeConfigSet, HttpStatus.OK);
   }
@@ -109,14 +111,14 @@ public class ClusterController {
   @GetMapping(value = "/context/current", produces = "application/json")
   @CrossOrigin("http://localhost:4200")
   public ResponseEntity<String> getCurrentContext() {
-    log.info(" Current context set to: " + ClusterCommands.CURRENT_CONTEXT);
-    return new ResponseEntity<>(ClusterCommands.CURRENT_CONTEXT, HttpStatus.OK);
+    log.info(" Current context set to: " + clusterCommands.CURRENT_CONTEXT);
+    return new ResponseEntity<>(clusterCommands.CURRENT_CONTEXT, HttpStatus.OK);
   }
 
   @PostMapping(value = "/context/{currentContext}", produces = "application/json")
   @CrossOrigin("http://localhost:4200")
   public void setCurrentContext(@PathVariable String currentContext) {
-    ClusterCommands.CURRENT_CONTEXT = currentContext;
+    clusterCommands.CURRENT_CONTEXT = currentContext;
     log.info("setting context to " + currentContext);
     this.clusterCommandLogMap.clear();
     client.setDefaultClient();
@@ -129,7 +131,7 @@ public class ClusterController {
       }
     }).start();
 
-    new Thread(() -> serviceHelper.generateServiceData()).start();
+    new Thread(serviceHelper::generateServiceData).start();
     ClusterCommands.clusterCommandsMap.keySet().parallelStream().forEach(
         command -> {
           try {

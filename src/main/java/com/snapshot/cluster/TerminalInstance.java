@@ -1,20 +1,21 @@
 package com.snapshot.cluster;
 
-import static com.snapshot.cluster.constants.ClusterCommands.CONFIG_SETTING;
-import static com.snapshot.cluster.constants.ClusterCommands.CURRENT_CONTEXT;
-
+import com.snapshot.cluster.constants.ClusterCommands;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TerminalInstance {
 
+  @Autowired
+  private ClusterCommands clusterCommands;
+
   public StringBuilder getCommandOutput(String command) throws IOException {
-    command = command + CONFIG_SETTING + CURRENT_CONTEXT;
-    BufferedReader reader = getBIS(command);
+    BufferedReader reader = getBIS(command + clusterCommands.getConfigSetting());
     String line;
     StringBuilder output = new StringBuilder();
     while ((line = reader.readLine()) != null) {

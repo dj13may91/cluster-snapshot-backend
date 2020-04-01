@@ -21,10 +21,10 @@ public class Services {
   private int replicas;
   private int availableReplicas;
   private String image;
-  private List<V1DeploymentCondition> deploymentStatuses;
-  private DeploymentResourceDetails limits;
-  private DeploymentResourceDetails requests;
-  private List<DeploymentResourceDetails> resourceDetails;
+//  private List<V1DeploymentCondition> deploymentStatuses;
+//  private DeploymentResourceDetails limits;
+//  private DeploymentResourceDetails requests;
+//  private List<DeploymentResourceDetails> resourceDetails;
 
   public String getServiceCommand() {
     return ClusterCommands.getCommandToDescribeService(this);
